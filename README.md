@@ -16,7 +16,8 @@
 2. 对"现状为什么是这样"分开生成 ≥3 个根本不同的解释，各估概率。
 3. 只做能区分不同解释的最便宜测试。
 4. 本质的判据：规则少、跨案例不变、能预测没见过的案例、能拿来生成新实例。
-5. 把结论压成几条规则，**一次性**和用户确认。这是整个流程里唯一需要人在场的沟通点。
+5. **先证伪，再确认**：在没用于归纳的留出数据（更长、更早或没见过的案例）上跑区分测试；只凭一小段数据得出的只是候选假设。
+6. 把通过测试的结论压成几条规则，**一次性**和用户确认。这是整个流程里唯一需要人在场的沟通点。
 
 > 本质认清了，就不需要细节沟通；总要回头沟通细节，说明本质没认清。
 
@@ -66,7 +67,7 @@ done
 
 ## English
 
-**AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests, and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute end to end. Reversible steps run directly, and irreversible ones are batched for a single approval. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Codex, Gemini CLI and opencode.
+**AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute end to end. Reversible steps run directly, and irreversible ones are batched for a single approval. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Codex, Gemini CLI and opencode.
 
 Companion book (Chinese, free): https://ai-era-new-life.vercel.app
 
