@@ -44,7 +44,7 @@
 - **概率和规则要记账**，到期打分复盘。
 - **不挤牙膏**：开头一次问完，确认本质后一口气跑到底。
 
-完整内容见 [`skills/ai-thinking/SKILL.md`](skills/ai-thinking/SKILL.md)。
+完整内容见 [`skills/ai-thinking/SKILL.md`](skills/ai-thinking/SKILL.md)。维护者每次更新请按 [RELEASING.md](RELEASING.md) 同步所有位置。
 
 ## 安装
 
