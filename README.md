@@ -47,7 +47,7 @@
 - **不挤牙膏**：开头一次问完，确认本质后一口气跑到底。
 - **独当一面**：问清楚就放手，结果自己担（先自己验证再说做完），分清可逆与不可逆，敢说真话并给替代方案，交付前过"资深行家愿不愿意签名"这一关。
 
-完整内容见 [`skills/ai-thinking/SKILL.md`](skills/ai-thinking/SKILL.md)。维护者每次更新请按 [RELEASING.md](RELEASING.md) 同步所有位置。
+完整内容见 [`skills/ai-thinking/SKILL.md`](skills/ai-thinking/SKILL.md)。
 
 ## 安装
 
