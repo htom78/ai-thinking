@@ -31,11 +31,14 @@
 - **度量选错**：选好算的指标，而不是回答"用户拿这个结论做什么"的指标（按金额或影响算）。
 - **把"做不到"当终点**：删掉一条路后，还要问剩下的部分里有什么能做、能复制。
 - **只学"做了什么"，没学"为什么看得懂"**：复制前先答出"它为什么值钱""什么情况算逻辑破了"。
+- **看到反常的坚持，只在外面挑毛病**：先还原对方逻辑，再自己把对象吃透，两边对照。
+- **停留在任务层**（偏离第 6 条；前面已有 5 条）：只看到要交付的任务，没有追问每个任务服务哪个结果。验收能逐条打勾，却说不出结果有没有达成。先写清它服务的结果、怎么知道达成了，按结果验收。
 - **先毛估估，再精算**：宁要模糊的正确，不要精确的错误。
 
 ## 核心原则
 
 - **先认清本质，再出方案。**
+- **证伪对着现实，确认对着人**：确认之前，疑问拿数据或小样本去试，不去问人。问人只用于那一次确认。
 - **10x 定方向**：10% 的改进有无限多种，10x 让老办法失效，逼你只留最关键的 20%。
 - **不问"我怎么做"，问"谁来做"**：执行交给 AI，人负责认本质、定目标、做选择。
 - **能做成品就不写描述**，用真实数据挑。
@@ -47,8 +50,16 @@
 - **概率和规则要记账**，到期打分复盘。预测账本默认 `~/.agents/memory/ledgers/predictions.csv`，所有工具共用一份；技能自带打分脚本 `scripts/brier.py`，第一次使用的步骤见 SKILL.md 第 6 步。
 - **不挤牙膏**：细节不问；只在分歧点一次问完最关键的 1–3 个问题，问完写成规格再跑。
 - **独当一面**：交证据而不是交结论，自己不给自己打分（独立验证者只拿规格和产出来尝试推翻），责任在人（风险、未验证项和不确定性放在汇总最前），分清可逆与不可逆，敢说真话并给替代方案。签名测试由验证者回答，不由作者回答。
+- **带人时交接本质**：可选模块。交本质、标准和判据，不交切碎的任务。会只留决策会和本质对齐会。一个人加 AI 对整个结果负责。
+
 
 完整内容见 [`skills/ai-thinking/SKILL.md`](skills/ai-thinking/SKILL.md)。
+
+## 不装技能时
+
+[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 懒人包在 [`portable/workbuddy/`](portable/workbuddy/安装说明.md)。官方没写明上传包的格式，要等 Tom 实际上传一次才能确认。ChatGPT 懒人包在 [`portable/chatgpt/`](portable/chatgpt/安装说明.md)：个人账号用项目；自定义 GPT 只留给 Business / Enterprise / Edu，企业工作区计划 2026-12-11 下线。
+
+[`book-drafts/`](book-drafts/README.md) 是三篇还没上线的书稿，没有链进网站。
 
 ## 安装
 
@@ -88,6 +99,7 @@ done
 - 2026-10-23：新增核心原则「一次只攻一个约束」（约束理论，Goldratt《The Goal》1984）；第 6 步复盘每周固定问「现在的约束是什么、有没有移动」。
 - 2026-10-22：问在分歧点、不问在细节上：三种必须问的情况、问前自检、问后写成规格再执行，提示词前缀同步修改。独当一面改为交证据、独立验证者不自评分、责任在人；留任测试改名为签名测试，由验证者回答。新增「按级放权」（L1 新手 / L2 胜任 / L3 资深）：可逆与否和放手多大分开看。
 - 2026-10-22：写明预测账本约定：默认 `~/.agents/memory/ledgers/predictions.csv`、固定列、`outcome` 只填 空/0/1/void、写下后不改判断本身；技能自带 `scripts/brier.py` 打分。
+- 2026-10-22：偏离新增「停留在任务层」（第 6 条，原有第 5 条保留）。核心原则补上「证伪对着现实，确认对着人」。预测账本和规则账本改为工作区文件。新增可选模块「团队协作」。新增 `portable/`（压缩提示词、账本模板、周复盘、Brier 脚本）、WorkBuddy 懒人包和 ChatGPT 懒人包。账本、周复盘、打分脚本只留一份正本。`book-drafts/` 放了三篇未上线书稿。WorkBuddy 上传格式、ChatGPT 这套用法都还没在真实账号里验证。个人账号用 ChatGPT 项目；自定义 GPT 计划下线（企业工作区 2026-12-11）。
 - 2026-10-21：新增"做事的气质：独当一面"：问清楚就放手、结果自己担、分清可逆与不可逆、敢说真话、留任测试。
 - 2026-10-21：README 与配套书 v13 明确 AI 思维的价值是让人从繁琐执行中解放出来，更轻松。
 - 2026-10-21：安装脚本改为先备份不删除；新增 WorkBuddy、pi 支持；Codex 直接读 `~/.agents/skills`，去掉多余链接。
@@ -97,6 +109,8 @@ done
 ## English
 
 **AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute to a written spec. It asks at divergence points, not about details (at most one to three questions, each with a default). Reversible steps run at the earned autonomy level (L1–L3); irreversible ones are batched for a single approval. Deliverables carry evidence mapped to acceptance criteria, and an independent verifier, not the author, tries to break them. Probability estimates go into one CSV ledger shared by all tools (default `~/.agents/memory/ledgers/predictions.csv`) and are scored with the bundled `scripts/brier.py`. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
+
+`portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. Unpublished chapter drafts are in `book-drafts/` and are not linked from the site.
 
 Companion book (Chinese, free): https://ai-era-new-life.vercel.app
 
