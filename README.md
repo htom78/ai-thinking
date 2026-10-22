@@ -44,7 +44,7 @@
 - **单向门 / 双向门**：可逆与否决定要不要人确认。不可撤回的（花钱、对外发送、删除、上线）攒成一批，让人一次确认；可撤回的按当前级别做。
 - **按级放权**：L1 只出计划和草稿，逐步由人确认；L2 按规格自主做可撤回的步骤，最后交证据；L3 长期验收通过后可跑更长周期，只在分歧点和单向门停下。可靠程度决定放手多大，和可逆与否是两件事。
 - **AI 方案天然趋同**：每个方案单独生成，换数据源和视角。
-- **概率和规则要记账**，到期打分复盘。
+- **概率和规则要记账**，到期打分复盘。预测账本默认 `~/.agents/memory/ledgers/predictions.csv`，所有工具共用一份；技能自带打分脚本 `scripts/brier.py`，第一次使用的步骤见 SKILL.md 第 6 步。
 - **不挤牙膏**：细节不问；只在分歧点一次问完最关键的 1–3 个问题，问完写成规格再跑。
 - **独当一面**：交证据而不是交结论，自己不给自己打分（独立验证者只拿规格和产出来尝试推翻），责任在人（风险、未验证项和不确定性放在汇总最前），分清可逆与不可逆，敢说真话并给替代方案。签名测试由验证者回答，不由作者回答。
 
@@ -87,6 +87,7 @@ done
 
 - 2026-10-23：新增核心原则「一次只攻一个约束」（约束理论，Goldratt《The Goal》1984）；第 6 步复盘每周固定问「现在的约束是什么、有没有移动」。
 - 2026-10-22：问在分歧点、不问在细节上：三种必须问的情况、问前自检、问后写成规格再执行，提示词前缀同步修改。独当一面改为交证据、独立验证者不自评分、责任在人；留任测试改名为签名测试，由验证者回答。新增「按级放权」（L1 新手 / L2 胜任 / L3 资深）：可逆与否和放手多大分开看。
+- 2026-10-22：写明预测账本约定：默认 `~/.agents/memory/ledgers/predictions.csv`、固定列、`outcome` 只填 空/0/1/void、写下后不改判断本身；技能自带 `scripts/brier.py` 打分。
 - 2026-10-21：新增"做事的气质：独当一面"：问清楚就放手、结果自己担、分清可逆与不可逆、敢说真话、留任测试。
 - 2026-10-21：README 与配套书 v13 明确 AI 思维的价值是让人从繁琐执行中解放出来，更轻松。
 - 2026-10-21：安装脚本改为先备份不删除；新增 WorkBuddy、pi 支持；Codex 直接读 `~/.agents/skills`，去掉多余链接。
@@ -95,7 +96,7 @@ done
 
 ## English
 
-**AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute to a written spec. It asks at divergence points, not about details (at most one to three questions, each with a default). Reversible steps run at the earned autonomy level (L1–L3); irreversible ones are batched for a single approval. Deliverables carry evidence mapped to acceptance criteria, and an independent verifier, not the author, tries to break them. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
+**AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute to a written spec. It asks at divergence points, not about details (at most one to three questions, each with a default). Reversible steps run at the earned autonomy level (L1–L3); irreversible ones are batched for a single approval. Deliverables carry evidence mapped to acceptance criteria, and an independent verifier, not the author, tries to break them. Probability estimates go into one CSV ledger shared by all tools (default `~/.agents/memory/ledgers/predictions.csv`) and are scored with the bundled `scripts/brier.py`. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
 
 Companion book (Chinese, free): https://ai-era-new-life.vercel.app
 

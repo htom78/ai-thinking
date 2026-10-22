@@ -31,7 +31,7 @@ description: >-
 - **先删后自动化。** 顺序：质疑需求 → 删除 → 简化 → 加速 → 自动化。
 - **一次只攻一个约束（约束理论，Goldratt《The Goal》1984）。** 任一时刻卡住整个结果的只有一个环节；在非约束环节上的改进都是白费，只会让东西在约束前堆得更多。动手前先回答“现在卡住结果的是哪一个环节”，不在这一环上的改进一律推后。处理顺序：先榨干现有约束 → 让其他环节都配合它 → 最后才花钱扩大它 → 约束移动后重新找。和“先删后自动化”是同一种思路：一个管做什么，一个管在哪里做。
 - **AI 方案天然趋同，多样性主要来自输入。** 不同模型之间也趋同（Artificial Hivemind, NeurIPS 2025）；要换数据源、换人设、换真实用户反馈，每个方案单独开一次生成，并为每个方案估概率（Verbalized Sampling, arXiv 2510.01171）。
-- **概率要记账。** 所有「估计」概率写进预测账本，到期打分（Brier），用结果修正下次估计。
+- **概率要记账。** 所有「估计」概率写进预测账本，到期打分（Brier），用结果修正下次估计。账本默认放 `~/.agents/memory/ledgers/predictions.csv`，所有项目、所有 AI 工具共用一份，不放进任何会公开发布的目录；格式和打分见第 6 步。
 - **验证比生成贵。** 试得越多越容易挑中运气好的；每个方案写清怎么验证、花多少。
 - **AI 评审不代替用户品味。** 品味用来定标准和最后拍板，但不能代替实际测量；AI 评审要换位、换模型、对真实数据锚定，记录用户每次的选择和理由。
 - **注意力是最稀缺的资源，不挤牙膏。** 不要一步一问、让人守在电脑前不停确认。细节不问；只有分歧点才问，一次问完最关键的 1–3 个，每个附上默认答案。问完写成规格，按规格往下做；规格要变，先改规格。单向门攒成一批、一次性确认。
@@ -141,6 +141,14 @@ description: >-
 - 按周对照成功判据：继续、调整、换方案或重新认识本质。
 - 每周固定问一次：现在的约束是什么？和上周比有没有移动？约束解决后会转移到别处，复盘要跟着它走，而不是继续优化已经不卡的环节。
 - 预测账本和规则账本到期打分；记录用户的选择和理由，作为下次的标准。
+- 预测账本是 CSV，列为 `id,date,claim,p,due,resolve_source,outcome,resolved_on,project`：`p` 是 0–1 的概率，`date`、`due` 写 YYYY-MM-DD，`outcome` 只能是 空（未判）、`0`、`1` 或 `void`（作废，不计分）。写下后只填 `outcome` 和 `resolved_on`，不改 `claim`、`p`、`due`。复盘先跑账本同目录的 `python3 brier.py`（`--project 名称` 只看一个项目）：列出到期未判的条目，算 Brier 分和校准表。
+- 第一次使用：把技能自带的 `scripts/brier.py` 和一个只有表头的空 CSV 放进账本目录（技能装在别处就换成对应路径；已有账本不会被覆盖）：
+  ```bash
+  mkdir -p ~/.agents/memory/ledgers && cd ~/.agents/memory/ledgers
+  cp ~/.agents/skills/ai-thinking/scripts/brier.py .
+  [ -e predictions.csv ] || echo 'id,date,claim,p,due,resolve_source,outcome,resolved_on,project' > predictions.csv
+  python3 brier.py --selftest && python3 brier.py
+  ```
 - 重复性的复盘设成定时任务。
 - 每月一次用同样方法复盘本技能本身。
 
