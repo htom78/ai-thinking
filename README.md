@@ -20,10 +20,10 @@
 4. 本质的判据：规则少、跨案例不变、能预测没见过的案例、能拿来生成新实例。
 5. **先证伪，再确认**：在没用于归纳的留出数据（更长、更早或没见过的案例）上跑区分测试；只凭一小段数据得出的只是候选假设。
    - 留出数据只开一次：看过结果再改解释，下一轮要换新的留出数据。
-   - 没有留出数据时，标成"候选本质"，写明验证数据、到期时间和推翻条件，到期前只走可撤回的步骤。
-6. 把通过测试的结论压成几条规则，**一次性**和用户确认。这是整个流程里唯一需要人在场的沟通点。
+   - 没有留出数据时，标成"候选本质"，写明验证数据、到期时间和推翻条件，到期前只按当前级别走可撤回的步骤。
+6. 把通过测试的结论压成几条规则，**一次性**和用户确认，写入规格。分歧点和单向门仍要停。
 
-> 本质认清了，就不需要细节沟通；总要回头沟通细节，说明本质没认清。
+> 问在分歧点，不问在细节上。默认不零碎追问；碰到两种理解会走向不同的不可逆动作或明显不同的产出、猜错比问一次更贵、或新事实让假设失效，一次问清最关键的 1–3 个问题，每个附默认答案。问完写成规格，按规格执行。
 
 ## 认识本质时最常见的偏离
 
@@ -44,12 +44,14 @@
 - **能做成品就不写描述**，用真实数据挑。
 - **先设计评估器，再生成。**
 - **先删后自动化。**
-- **单向门 / 双向门**：可撤回的 AI 直接做；不可撤回的（花钱、对外发送、删除、上线）攒成一批，让人一次确认。
+- **单向门 / 双向门**：可逆与否决定要不要人确认。不可撤回的（花钱、对外发送、删除、上线）攒成一批，让人一次确认；可撤回的按当前级别做。
+- **按级放权**：L1 只出计划和草稿，逐步由人确认；L2 按规格自主做可撤回的步骤，最后交证据；L3 长期验收通过后可跑更长周期，只在分歧点和单向门停下。可靠程度决定放手多大，和可逆与否是两件事。
 - **AI 方案天然趋同**：每个方案单独生成，换数据源和视角。
-- **概率和规则要记账**，写在工作区的 CSV 或 Markdown 里，到期打分复盘。不靠某个平台的记忆。
-- **不挤牙膏**：开头一次问完，确认本质后一口气跑到底。
-- **独当一面**：问清楚就放手，结果自己担（先自己验证再说做完），分清可逆与不可逆，敢说真话并给替代方案，交付前过"资深行家愿不愿意签名"这一关。
+- **概率和规则要记账**，到期打分复盘。预测账本默认 `~/.agents/memory/ledgers/predictions.csv`，所有工具共用一份；技能自带打分脚本 `scripts/brier.py`，第一次使用的步骤见 SKILL.md 第 6 步。
+- **不挤牙膏**：细节不问；只在分歧点一次问完最关键的 1–3 个问题，问完写成规格再跑。
+- **独当一面**：交证据而不是交结论，自己不给自己打分（独立验证者只拿规格和产出来尝试推翻），责任在人（风险、未验证项和不确定性放在汇总最前），分清可逆与不可逆，敢说真话并给替代方案。签名测试由验证者回答，不由作者回答。
 - **带人时交接本质**：可选模块。交本质、标准和判据，不交切碎的任务。会只留决策会和本质对齐会。一个人加 AI 对整个结果负责。
+
 
 完整内容见 [`skills/ai-thinking/SKILL.md`](skills/ai-thinking/SKILL.md)。
 
@@ -94,6 +96,9 @@ done
 
 ## 更新记录
 
+- 2026-10-23：新增核心原则「一次只攻一个约束」（约束理论，Goldratt《The Goal》1984）；第 6 步复盘每周固定问「现在的约束是什么、有没有移动」。
+- 2026-10-22：问在分歧点、不问在细节上：三种必须问的情况、问前自检、问后写成规格再执行，提示词前缀同步修改。独当一面改为交证据、独立验证者不自评分、责任在人；留任测试改名为签名测试，由验证者回答。新增「按级放权」（L1 新手 / L2 胜任 / L3 资深）：可逆与否和放手多大分开看。
+- 2026-10-22：写明预测账本约定：默认 `~/.agents/memory/ledgers/predictions.csv`、固定列、`outcome` 只填 空/0/1/void、写下后不改判断本身；技能自带 `scripts/brier.py` 打分。
 - 2026-10-22：偏离新增「停留在任务层」（第 6 条，原有第 5 条保留）。核心原则补上「证伪对着现实，确认对着人」。预测账本和规则账本改为工作区文件。新增可选模块「团队协作」。新增 `portable/`（压缩提示词、账本模板、周复盘、Brier 脚本）、WorkBuddy 懒人包和 ChatGPT 懒人包。账本、周复盘、打分脚本只留一份正本。`book-drafts/` 放了三篇未上线书稿。WorkBuddy 上传格式、ChatGPT 这套用法都还没在真实账号里验证。个人账号用 ChatGPT 项目；自定义 GPT 计划下线（企业工作区 2026-12-11）。
 - 2026-10-21：新增"做事的气质：独当一面"：问清楚就放手、结果自己担、分清可逆与不可逆、敢说真话、留任测试。
 - 2026-10-21：README 与配套书 v13 明确 AI 思维的价值是让人从繁琐执行中解放出来，更轻松。
@@ -103,7 +108,7 @@ done
 
 ## English
 
-**AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute end to end. Reversible steps run directly, and irreversible ones are batched for a single approval. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
+**AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute to a written spec. It asks at divergence points, not about details (at most one to three questions, each with a default). Reversible steps run at the earned autonomy level (L1–L3); irreversible ones are batched for a single approval. Deliverables carry evidence mapped to acceptance criteria, and an independent verifier, not the author, tries to break them. Probability estimates go into one CSV ledger shared by all tools (default `~/.agents/memory/ledgers/predictions.csv`) and are scored with the bundled `scripts/brier.py`. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
 
 `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. Unpublished chapter drafts are in `book-drafts/` and are not linked from the site.
 
