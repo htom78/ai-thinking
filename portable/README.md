@@ -1,6 +1,8 @@
 # 不用 Grok Bot 时怎么用
 
-这一目录给没有 Grok Bot 的人。技能正文仍是仓库里的 [`skills/ai-thinking/SKILL.md`](../skills/ai-thinking/SKILL.md)。这里是压缩版提示词、账本文件和周复盘，换到别的产品里还能接着用。安装脚本只复制 `skills/ai-thinking`，不包含这一目录；要用这里的文件，克隆仓库后自己拷。
+这一目录给没有 Grok Bot 的人。技能正文仍是仓库里的 [`skills/ai-thinking/SKILL.md`](../skills/ai-thinking/SKILL.md)。这里是压缩版提示词、账本文件和周复盘，换到别的产品里还能接着用。安装脚本会安装技能，并把仓库根目录的 [`soul.md`](../soul.md) 放到 `~/.agents/soul.md`；这一目录本身不会被安装，要用这里的文件就克隆仓库后自己拷。
+
+[`soul.md`](../soul.md) 是工作默认，始终生效，可以单独贴进系统提示。下面的 [`prompt.md`](prompt.md) 和两个懒人包里的技能是八步流程，只在大任务时用。ChatGPT、WorkBuddy 懒人包里的 `soul.md` 指向仓库根目录那一份。
 
 账本放在工作区里，用 CSV 或 Markdown。不要把概率和规则只写进某个产品的记忆。记忆是抽出来的摘要，对不上原文，换产品也会丢。
 
@@ -32,7 +34,7 @@ python3 portable/brier.py portable/ledgers/predictions.csv
 - [定时任务](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Automation-Guide)
 - [记忆](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Memory)
 
-WorkBuddy 的上传格式还没验证，要等 Tom 实际上传一次才算数。官方文档只写了「选中本地技能包」，没有写明是 zip 还是文件夹，也没有写明 `SKILL.md` 放在哪一层。现在的 zip 里，顶层是 `ai-thinking/` 文件夹，里面是 `SKILL.md`。传失败时按安装说明里的另外两种试法。
+WorkBuddy 的上传格式还没验证，要等 Tom 实际上传一次才算数。官方文档只写了「选中本地技能包」，没有写明是 zip 还是文件夹，也没有写明 `SKILL.md` 放在哪一层。现在的 zip 里，顶层是 `ai-thinking/` 文件夹，里面是 `SKILL.md` 和 `soul.md`。传失败时按安装说明里的另外两种试法。
 
 `workbuddy/ai-thinking/` 里的账本、周复盘和 `scripts/brier.py` 是指向上面正本的链接，不要另改一份。`ai-thinking.zip` 里打进去的是文件本身，方便上传。云端任务读不到本机账本，周复盘用本地任务。
 
@@ -48,7 +50,7 @@ WorkBuddy 的上传格式还没验证，要等 Tom 实际上传一次才算数�
 
 项目做法：新建项目，把 `5-不建GPT的用法.md` 里的提示词贴进项目指令，再上传 `2-知识文件/` 里的文件。中国大陆需要 VPN。
 
-`2-知识文件/ai-thinking-SKILL.md` 是 ChatGPT 专用稿，账本一节改成每次上传 CSV、结束时下载替换。`predictions.csv`、`rules.csv`、`weekly-review.md`、`brier.py` 指向本目录的正本，不要另改一份。安装说明末尾的「尚未确认」仍然有效：这套还没在真实账号里搭过。
+`2-知识文件/ai-thinking-SKILL.md` 是 ChatGPT 专用稿，账本一节改成每次上传 CSV、结束时下载替换。`soul.md`、`predictions.csv`、`rules.csv`、`weekly-review.md`、`brier.py` 指向正本，不要另改一份。安装说明末尾的「尚未确认」仍然有效：这套还没在真实账号里搭过。
 
 ## 直接贴进对话产品
 

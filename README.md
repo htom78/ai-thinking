@@ -10,6 +10,29 @@
 
 它不是又一套给人加压的方法：目的是让人从繁琐的执行里走出来，更轻松地把事做成。
 
+## 工作默认
+
+八步流程很重，只在大任务（目标、项目、难题、人生决策）时触发。日常小任务不走八步。
+
+[`soul.md`](soul.md) 是一层更轻的工作默认：像一个成熟的资深工程师那样做事。工作默认始终生效。八步流程只在大任务时触发，触发之后仍然遵守 `soul.md`。这一层可以单独使用，整段粘贴到系统提示、`AGENTS.md` 或自定义指令里即可。
+
+正文按四个阶段写：动手前、要人决策时、执行中、收尾。共同目标是让「返工的代价 + 占用人注意力的代价」之和最小。
+
+安装脚本会把它放到 `~/.agents/soul.md`，并复制一份到 `~/.agents/skills/ai-thinking/soul.md`。技能目录那一份会跟着各工具的软链接走。
+
+粘贴位置：
+
+| 工具 | 放在哪 |
+|---|---|
+| ChatGPT 项目指令、DeepSeek、Kimi、豆包、Claude Projects | 系统提示词或项目说明的最前面。ChatGPT 懒人包同时把 `soul.md` 放进知识文件 |
+| Cursor | 用户规则，或项目里的 `AGENTS.md` |
+| Claude Code | `CLAUDE.md`，或用户自定义指令 |
+| Codex | `AGENTS.md`。安装后文件在 `~/.agents/soul.md` |
+| Gemini CLI | `GEMINI.md` |
+| opencode、pi、WorkBuddy | 智能体说明或自定义指令。WorkBuddy 懒人包把 `soul.md` 打进技能包 |
+
+某个工具若只加载 `SKILL.md`、不会自动读旁边的文件，就把 `soul.md` 再贴进上面的始终生效位置。
+
 ## 第 0.5 步：先认识本质
 
 方案只能和对问题的理解一样深。动手之前先做五件事：
@@ -69,7 +92,7 @@
 curl -fsSL https://raw.githubusercontent.com/htom78/ai-thinking/main/install.sh | bash
 ```
 
-安装脚本会把技能放到 `~/.agents/skills/ai-thinking`（已是 git 仓库则 `git pull` 更新），再给各工具建软链接。**不会删除任何东西**：遇到旧目录或实体残留，先移到 `~/.Trash/ai-thinking-replaced-时间戳` 备份。
+安装脚本会把技能放到 `~/.agents/skills/ai-thinking`（已是 git 仓库则 `git pull` 更新），并把 `soul.md` 装到 `~/.agents/soul.md` 和技能目录里，再给各工具建软链接。**不会删除任何东西**：遇到旧目录、实体残留，或已有且内容不同的 `soul.md`，先移到 `~/.Trash/` 备份。
 
 手动安装：
 
@@ -77,6 +100,8 @@ curl -fsSL https://raw.githubusercontent.com/htom78/ai-thinking/main/install.sh 
 git clone https://github.com/htom78/ai-thinking.git
 mkdir -p ~/.agents/skills
 cp -R ai-thinking/skills/ai-thinking ~/.agents/skills/
+cp ai-thinking/soul.md ~/.agents/soul.md
+cp ai-thinking/soul.md ~/.agents/skills/ai-thinking/soul.md
 for d in ~/.workbuddy/skills ~/.claude/skills ~/.cursor/skills ~/.gemini/skills ~/.config/opencode/skills ~/.pi/agent/skills; do
   mkdir -p "$d" && ln -sfn ~/.agents/skills/ai-thinking "$d/ai-thinking"
 done
@@ -92,10 +117,11 @@ done
 | WorkBuddy | `~/.workbuddy/skills/ai-thinking` |
 | pi | `~/.pi/agent/skills/ai-thinking` |
 
-使用时对 AI 说"用 AI思维"或"认清本质""10x""帮我出方案并执行"，即可触发。
+使用时对 AI 说"用 AI思维"或"认清本质""10x""帮我出方案并执行"，即可触发八步。日常小任务不触发八步；`soul.md` 放进系统提示或自定义指令后，工作默认一直生效。
 
 ## 更新记录
 
+- 2026-10-23：新增工作默认 `soul.md`。始终生效，可单独粘贴；八步流程只在大任务时触发。按四个阶段写：动手前、要人决策时、执行中、收尾。总原则是让返工的代价与占用注意力的代价之和最小。要人决策时攒成一批，并维护决策日志（已拍板、按默认先推进、待决定）。`install.sh` 默认安装到 `~/.agents/soul.md` 和技能目录。ChatGPT、WorkBuddy 懒人包同步该文件，并把技能副本对齐到当前 `SKILL.md`。
 - 2026-10-23：新增核心原则「一次只攻一个约束」（约束理论，Goldratt《The Goal》1984）；第 6 步复盘每周固定问「现在的约束是什么、有没有移动」。
 - 2026-10-22：问在分歧点、不问在细节上：三种必须问的情况、问前自检、问后写成规格再执行，提示词前缀同步修改。独当一面改为交证据、独立验证者不自评分、责任在人；留任测试改名为签名测试，由验证者回答。新增「按级放权」（L1 新手 / L2 胜任 / L3 资深）：可逆与否和放手多大分开看。
 - 2026-10-22：写明预测账本约定：默认 `~/.agents/memory/ledgers/predictions.csv`、固定列、`outcome` 只填 空/0/1/void、写下后不改判断本身；技能自带 `scripts/brier.py` 打分。
@@ -110,7 +136,7 @@ done
 
 **AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute to a written spec. It asks at divergence points, not about details (at most one to three questions, each with a default). Reversible steps run at the earned autonomy level (L1–L3); irreversible ones are batched for a single approval. Deliverables carry evidence mapped to acceptance criteria, and an independent verifier, not the author, tries to break them. Probability estimates go into one CSV ledger shared by all tools (default `~/.agents/memory/ledgers/predictions.csv`) and are scored with the bundled `scripts/brier.py`. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
 
-`portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. Unpublished chapter drafts are in `book-drafts/` and are not linked from the site.
+`soul.md` is a short, always-on working default (installed to `~/.agents/soul.md` as well as the skill directory). Paste it into a system prompt, `AGENTS.md`, or custom instructions; the eight-step skill runs only for large tasks and still follows `soul.md`. `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. The ChatGPT and WorkBuddy packs include `soul.md` and a skill text aligned with `skills/ai-thinking/SKILL.md`. Unpublished chapter drafts are in `book-drafts/` and are not linked from the site.
 
 Companion book (Chinese, free): https://ai-era-new-life.vercel.app
 
