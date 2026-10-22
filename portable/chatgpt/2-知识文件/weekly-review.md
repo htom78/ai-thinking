@@ -1,0 +1,1 @@
+../../templates/weekly-review.md

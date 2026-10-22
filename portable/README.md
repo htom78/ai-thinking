@@ -12,6 +12,7 @@
 | [`templates/weekly-review.md`](templates/weekly-review.md) | 每周复盘要填的空表 |
 | [`brier.py`](brier.py) | 给预测账本里已结算的行算 Brier |
 | [`workbuddy/`](workbuddy/安装说明.md) | WorkBuddy 懒人包。账本和打分脚本指向上面的正本 |
+| [`chatgpt/`](chatgpt/安装说明.md) | ChatGPT 懒人包。个人账号用项目；GPT 只留给企业工作区 |
 
 打分：
 
@@ -43,7 +44,11 @@ WorkBuddy 的上传格式还没验证，要等 Tom 实际上传一次才算数�
 
 ## ChatGPT
 
-两种放法。自定义 GPT：把 [`prompt.md`](prompt.md) 贴进 Instructions。或者建一个 Project，贴进项目说明，账本作为项目文件留着。中国大陆需要 VPN 才能用。
+懒人包在 [`chatgpt/`](chatgpt/安装说明.md)。按 OpenAI 帮助中心（2026 年 10 月）：个人账号（Free / Go / Plus / Pro）已经不能新建 GPT，自定义 GPT 在下线。企业工作区的下线日期是 2026 年 12 月 11 日，其他方案预计同一时间表，以账号里的通知为准。所以长期用「项目」（Projects）。自定义 GPT 只留给还有权限的 Business / Enterprise / Edu 工作区，而且只适合短期用。
+
+项目做法：新建项目，把 `5-不建GPT的用法.md` 里的提示词贴进项目指令，再上传 `2-知识文件/` 里的文件。中国大陆需要 VPN。
+
+`2-知识文件/ai-thinking-SKILL.md` 是 ChatGPT 专用稿，账本一节改成每次上传 CSV、结束时下载替换。`predictions.csv`、`rules.csv`、`weekly-review.md`、`brier.py` 指向本目录的正本，不要另改一份。安装说明末尾的「尚未确认」仍然有效：这套还没在真实账号里搭过。
 
 ## 直接贴进对话产品
 

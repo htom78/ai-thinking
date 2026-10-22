@@ -155,6 +155,37 @@ class BrierTests(unittest.TestCase):
             info = bundle.getinfo("ai-thinking/scripts/brier.py")
             self.assertEqual((info.external_attr >> 16) & 0o170000, 0o100000)
 
+    def test_chatgpt_pack_keeps_only_its_skill_variant(self) -> None:
+        folder = HERE / "chatgpt" / "2-知识文件"
+        self.assertEqual(
+            (folder / "predictions.csv").resolve(),
+            (HERE / "ledgers" / "predictions.csv").resolve(),
+        )
+        self.assertEqual(
+            (folder / "rules.csv").resolve(),
+            (HERE / "ledgers" / "rules.csv").resolve(),
+        )
+        self.assertEqual(
+            (folder / "weekly-review.md").resolve(),
+            (HERE / "templates" / "weekly-review.md").resolve(),
+        )
+        self.assertEqual((folder / "brier.py").resolve(), (HERE / "brier.py").resolve())
+        skill = folder / "ai-thinking-SKILL.md"
+        self.assertFalse(skill.is_symlink())
+        text = skill.read_text(encoding="utf-8")
+        self.assertIn("账本存成 CSV 文件（ChatGPT 版）", text)
+        self.assertIn("供用户下载", text)
+        main = (HERE.parent / "skills" / "ai-thinking" / "SKILL.md").read_text(encoding="utf-8")
+        def deviation(source: str) -> str:
+            for line in source.splitlines():
+                if line.startswith("6. **停留在任务层"):
+                    return line
+            raise AssertionError("missing deviation 6")
+        self.assertEqual(deviation(text), deviation(main))
+        notes = (HERE / "chatgpt" / "安装说明.md").read_text(encoding="utf-8")
+        self.assertIn("尚未确认的", notes)
+        self.assertIn("2026 年 12 月 11 日", notes)
+
 
 if __name__ == "__main__":
     unittest.main()

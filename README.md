@@ -55,7 +55,7 @@
 
 ## 不装技能时
 
-[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 懒人包在 [`portable/workbuddy/`](portable/workbuddy/安装说明.md)。官方没写明上传包的格式，要等 Tom 实际上传一次才能确认。
+[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 懒人包在 [`portable/workbuddy/`](portable/workbuddy/安装说明.md)。官方没写明上传包的格式，要等 Tom 实际上传一次才能确认。ChatGPT 懒人包在 [`portable/chatgpt/`](portable/chatgpt/安装说明.md)：个人账号用项目；自定义 GPT 只留给 Business / Enterprise / Edu，企业工作区计划 2026-12-11 下线。
 
 [`book-drafts/`](book-drafts/README.md) 是三篇还没上线的书稿，没有链进网站。
 
@@ -94,7 +94,7 @@ done
 
 ## 更新记录
 
-- 2026-10-22：偏离新增「停留在任务层」（第 6 条，原有第 5 条保留）。核心原则补上「证伪对着现实，确认对着人」。预测账本和规则账本改为工作区文件。新增可选模块「团队协作」。新增 `portable/`（压缩提示词、账本模板、周复盘、Brier 脚本）和 WorkBuddy 懒人包。账本、周复盘、打分脚本只留一份正本。`book-drafts/` 放了三篇未上线书稿。上传包格式还没在 WorkBuddy 里验证。
+- 2026-10-22：偏离新增「停留在任务层」（第 6 条，原有第 5 条保留）。核心原则补上「证伪对着现实，确认对着人」。预测账本和规则账本改为工作区文件。新增可选模块「团队协作」。新增 `portable/`（压缩提示词、账本模板、周复盘、Brier 脚本）、WorkBuddy 懒人包和 ChatGPT 懒人包。账本、周复盘、打分脚本只留一份正本。`book-drafts/` 放了三篇未上线书稿。WorkBuddy 上传格式、ChatGPT 这套用法都还没在真实账号里验证。个人账号用 ChatGPT 项目；自定义 GPT 计划下线（企业工作区 2026-12-11）。
 - 2026-10-21：新增"做事的气质：独当一面"：问清楚就放手、结果自己担、分清可逆与不可逆、敢说真话、留任测试。
 - 2026-10-21：README 与配套书 v13 明确 AI 思维的价值是让人从繁琐执行中解放出来，更轻松。
 - 2026-10-21：安装脚本改为先备份不删除；新增 WorkBuddy、pi 支持；Codex 直接读 `~/.agents/skills`，去掉多余链接。

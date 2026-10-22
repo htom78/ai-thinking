@@ -5,8 +5,8 @@
 |---|---|---|---|
 
 ## 2. 预测账本
-- 本周到期的预测及结果（已写入 ledgers/predictions.csv）：
-- Brier 分数（`python3 brier.py <predictions.csv>`。仓库里：`python3 portable/brier.py portable/ledgers/predictions.csv`。WorkBuddy 工作空间里：`python3 scripts/brier.py ledgers/predictions.csv`）：总体 ___，近 4 周 ___
+- 本周到期的预测及结果（已写入 predictions.csv）：
+- Brier 分数（`python3 brier.py predictions.csv`。仓库里：`python3 portable/brier.py portable/ledgers/predictions.csv`。WorkBuddy 工作空间里：`python3 scripts/brier.py ledgers/predictions.csv`。ChatGPT 里：用代码工具按 brier.py 的逻辑算）：总体 ___，近 4 周 ___
 - 我在哪类事上系统性高估/低估：
 
 ## 3. 规则账本
