@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""给预测账本里已结算的行算 Brier 分数。只用 Python 标准库。"""
+"""给预测账本里已结算的行算 Brier 分数。只用 Python 标准库。
+
+正本在 portable/brier.py。WorkBuddy 懒人包里的 scripts/brier.py 指向这份。
+
+用法：python3 brier.py [predictions.csv]
+不写路径时，先找脚本上一级的 ledgers/predictions.csv，再找脚本旁边的 ledgers/predictions.csv。
+"""
 
 from __future__ import annotations
 
@@ -8,23 +14,12 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-REQUIRED = ("日期", "预测", "概率", "到期", "结果", "备注")
+PREDICTION_KEYS = ("预测内容", "预测")
+NOTE_KEYS = ("备注",)
+ID_KEYS = ("编号",)
+PROBABILITY_KEYS = ("概率",)
+OUTCOME_KEYS = ("结果",)
 
-UNRESOLVED = {
-    "",
-    "未到期",
-    "未结算",
-    "待定",
-    "未验证",
-    "?",
-    "-",
-    "—",
-    "na",
-    "n/a",
-    "none",
-}
-POSITIVE = {"1", "是", "对", "发生", "已发生", "兑现", "yes", "true", "y"}
-NEGATIVE = {"0", "否", "错", "未发生", "没发生", "未兑现", "no", "false", "n"}
 CHENG = {
     "零": 0,
     "一": 1,
@@ -48,7 +43,7 @@ class LedgerError(Exception):
 @dataclass
 class Resolved:
     line_no: int
-    date: str
+    ident: str
     prediction: str
     probability: float
     outcome: float
@@ -68,6 +63,13 @@ class Report:
         return sum(item.brier for item in self.resolved) / len(self.resolved)
 
 
+def cell(row: dict[str, str], keys: tuple[str, ...]) -> str:
+    for key in keys:
+        if key in row and row[key].strip():
+            return row[key].strip()
+    return ""
+
+
 def parse_probability(text: str) -> float:
     raw = text.strip().replace("％", "%")
     if not raw:
@@ -84,31 +86,40 @@ def parse_probability(text: str) -> float:
             raise ValueError(f"「{text}」不在 0% 到 100%")
         return number / 100
     number = float(raw)
+    if number > 1:
+        number /= 100.0
     if not 0 <= number <= 1:
         raise ValueError(f"「{text}」要写成 0 到 1，或 70%、七成")
     return number
 
 
 def parse_outcome(text: str) -> float | None:
-    raw = text.strip().lower()
-    if raw in UNRESOLVED:
+    raw = text.strip()
+    if raw == "":
         return None
-    if raw in POSITIVE:
+    if raw == "1":
         return 1.0
-    if raw in NEGATIVE:
+    if raw == "0":
         return 0.0
     raise ValueError(f"结果「{text}」看不懂。兑现写 1，没兑现写 0，没到期留空")
 
 
 def is_example(row: dict[str, str]) -> bool:
-    note = row.get("备注", "").strip()
-    mark = row.get("标记", "").strip()
-    prediction = row.get("预测", "").strip()
-    return note.startswith("示例") or mark.startswith("示例") or prediction.startswith("示例")
+    prediction = cell(row, PREDICTION_KEYS)
+    note = cell(row, NOTE_KEYS)
+    return "示例" in prediction or note.startswith("示例") or "示例" in note
 
 
-def is_blank(row: dict[str, str]) -> bool:
-    return all(not value.strip() for value in row.values())
+def default_csv() -> Path:
+    here = Path(__file__).resolve().parent
+    candidates = (
+        here.parent / "ledgers" / "predictions.csv",
+        here / "ledgers" / "predictions.csv",
+    )
+    for path in candidates:
+        if path.is_file():
+            return path
+    return candidates[-1]
 
 
 def load_and_score(path: Path) -> Report:
@@ -123,38 +134,36 @@ def load_and_score(path: Path) -> Report:
     if not rows:
         raise LedgerError(f"文件是空的：{path}")
     header = [name.strip() for name in rows[0]]
-    missing = [name for name in REQUIRED if name not in header]
-    if missing:
-        raise LedgerError("表头缺少：" + "、".join(missing))
+    if not any(name in header for name in PREDICTION_KEYS) or "概率" not in header or "结果" not in header:
+        raise LedgerError("表头需要有预测内容（或预测）、概率、结果")
 
     resolved: list[Resolved] = []
     skipped_example = 0
     skipped_unresolved = 0
     for offset, cells in enumerate(rows[1:], start=2):
-        if not any(cell.strip() for cell in cells):
+        if not any(cell_text.strip() for cell_text in cells):
             continue
         padded = cells + [""] * (len(header) - len(cells))
         row = {header[index]: padded[index].strip() for index in range(len(header))}
-        if is_blank(row) or is_example(row):
-            skipped_example += int(is_example(row))
+        if is_example(row):
+            skipped_example += 1
             continue
-        outcome_text = row.get("结果", "")
         try:
-            outcome = parse_outcome(outcome_text)
+            outcome = parse_outcome(cell(row, OUTCOME_KEYS) if row.get("结果", "").strip() else "")
         except ValueError as exc:
             raise LedgerError(f"第 {offset} 行：{exc}") from exc
         if outcome is None:
             skipped_unresolved += 1
             continue
         try:
-            probability = parse_probability(row.get("概率", ""))
+            probability = parse_probability(cell(row, PROBABILITY_KEYS))
         except ValueError as exc:
             raise LedgerError(f"第 {offset} 行：{exc}") from exc
         resolved.append(
             Resolved(
                 line_no=offset,
-                date=row.get("日期", ""),
-                prediction=row.get("预测", ""),
+                ident=cell(row, ID_KEYS),
+                prediction=cell(row, PREDICTION_KEYS),
                 probability=probability,
                 outcome=outcome,
                 brier=(probability - outcome) ** 2,
@@ -165,36 +174,50 @@ def load_and_score(path: Path) -> Report:
 
 def format_report(report: Report) -> str:
     if report.mean is None:
-        head = "没有已结算的预测。"
+        lines = ["还没有已揭晓的预测（结果列填 1 或 0 后再运行；示例行不计分）。"]
     else:
-        head = (
-            f"已结算 {len(report.resolved)} 条，平均 Brier {report.mean:.4f}"
-            "（越低越好。0 是全对；总说五成，分数是 0.25）"
-        )
-    lines = [
-        head,
-        f"跳过示例 {report.skipped_example} 条，未结算 {report.skipped_unresolved} 条",
-    ]
+        base = sum(item.outcome for item in report.resolved) / len(report.resolved)
+        lines = [
+            f"已揭晓 {len(report.resolved)} 条，平均 Brier = {report.mean:.3f}"
+            f"（越低越好。0 是全对；总猜 50% 为 0.250；"
+            f"按这批结果的发生率 {base:.2f} 猜为 {base * (1 - base):.3f}）"
+        ]
+    lines.append(
+        f"跳过示例 {report.skipped_example} 条，未结算 {report.skipped_unresolved} 条"
+    )
     for item in report.resolved:
-        when = item.date or "未写日期"
+        label = item.ident or f"第{item.line_no}行"
         lines.append(
-            f"- 第{item.line_no}行 {when}｜{item.prediction}｜"
-            f"概率 {item.probability:.4f}｜结果 {item.outcome:.0f}｜Brier {item.brier:.4f}"
+            f"{label}\t概率 {item.probability:.2f}\t结果 {item.outcome:.0f}\t"
+            f"Brier {item.brier:.3f}\t{item.prediction}"
         )
+    if report.resolved:
+        bins: dict[int, list[float]] = {}
+        for item in report.resolved:
+            bucket = min(int(item.probability * 10), 9)
+            bins.setdefault(bucket, []).append(item.outcome)
+        lines.append("校准（估计区间 → 实际发生率）：")
+        for bucket in sorted(bins):
+            values = bins[bucket]
+            lines.append(
+                f"  {bucket / 10:.1f}-{(bucket + 1) / 10:.1f}: "
+                f"{sum(values) / len(values):.2f}（{len(values)} 条）"
+            )
     return "\n".join(lines)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
-    if len(args) != 1:
-        print("用法：python3 brier.py <predictions.csv>", file=sys.stderr)
-        return 2
-    if args[0] in {"-h", "--help"}:
-        print("用法：python3 brier.py <predictions.csv>")
-        print("只给已结算的行算 Brier = (概率 - 结果)²，再取平均。示例行和未结算行跳过。")
+    if args and args[0] in {"-h", "--help"}:
+        print("用法：python3 brier.py [predictions.csv]")
+        print("只给结果为 1 或 0 的行算 Brier = (概率 - 结果)²，再取平均。示例行和未结算行跳过。")
         return 0
+    if len(args) > 1:
+        print("用法：python3 brier.py [predictions.csv]", file=sys.stderr)
+        return 2
+    path = Path(args[0]) if args else default_csv()
     try:
-        report = load_and_score(Path(args[0]))
+        report = load_and_score(path)
     except LedgerError as exc:
         print(str(exc), file=sys.stderr)
         return 1

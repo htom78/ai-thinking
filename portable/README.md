@@ -11,7 +11,7 @@
 | [`ledgers/rules.csv`](ledgers/rules.csv) | 规则账本模板，有一行「示例」 |
 | [`templates/weekly-review.md`](templates/weekly-review.md) | 每周复盘要填的空表 |
 | [`brier.py`](brier.py) | 给预测账本里已结算的行算 Brier |
-| [`workbuddy/`](workbuddy/README.md) | 懒人包的位置，文件还没放进来 |
+| [`workbuddy/`](workbuddy/安装说明.md) | WorkBuddy 懒人包。账本和打分脚本指向上面的正本 |
 
 打分：
 
@@ -19,27 +19,21 @@
 python3 portable/brier.py portable/ledgers/predictions.csv
 ```
 
-在 `portable/` 目录里则写成 `python3 brier.py ledgers/predictions.csv`。脚本只用 Python 标准库。Brier = (概率 − 结果)²，已结算的行取平均，越低越好。0 是全对；每条都写五成，分数是 0.25。备注或预测以「示例」开头的行不参与打分，结果空着的行视为没到期。概率写 0 到 1，或 `70%`、`七成`。脚本只读 CSV。账本若用 Markdown，自己对照着打，或另存一份 CSV 再跑。
+在 `portable/` 目录里则写成 `python3 brier.py ledgers/predictions.csv`。脚本只用 Python 标准库。Brier = (概率 − 结果)²，已结算的行取平均，越低越好。0 是全对；每条都写五成，分数是 0.25。预测内容或备注里带「示例」的行不参与打分，结果空着的行视为没到期。概率写 0 到 1，或 `70%`、`七成`；大于 1 且不超过 100 的数字按百分数算。结果只认 1 和 0。脚本只读 CSV。账本若用 Markdown，自己对照着打，或另存一份 CSV 再跑。这份脚本、`ledgers/` 和 `templates/weekly-review.md` 是正本。
 
 自测：`python3 portable/test_brier.py`
 
 ## WorkBuddy（腾讯）
 
-文档：
+懒人包在 [`workbuddy/`](workbuddy/安装说明.md)。按 `安装说明.md` 做：上传 `ai-thinking.zip`，把账本拷进工作空间，再建每周复盘。文档：
 
 - [技能](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Skills-Market)
 - [定时任务](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Automation-Guide)
 - [记忆](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Memory)
 
-技能文件就是一份 `SKILL.md`。上传步骤：左侧进入技能板块，点「添加技能 → 上传技能」，选中本地技能包。仓库里要传的是 `skills/ai-thinking` 这个目录（里面是 `SKILL.md`）。界面若只能选文件、不能选文件夹，先把这个目录打成压缩包再传。
+WorkBuddy 的上传格式还没验证，要等 Tom 实际上传一次才算数。官方文档只写了「选中本地技能包」，没有写明是 zip 还是文件夹，也没有写明 `SKILL.md` 放在哪一层。现在的 zip 里，顶层是 `ai-thinking/` 文件夹，里面是 `SKILL.md`。传失败时按安装说明里的另外两种试法。
 
-每周复盘：左侧「定时任务」，新建一条，重复选「每周」。提示词里写明用 AI思维技能，读工作空间里的 `predictions.csv`、`rules.csv`，按 [`templates/weekly-review.md`](templates/weekly-review.md) 写复盘。新建后先手动跑一次，看结果对不对，再开每周。
-
-定时任务有本地和云端。云端在云端沙箱里跑，电脑关机也能按时执行。云端读不到本机文件，也不能把结果推到企业微信。账本若在本机，周复盘用本地任务，运行时电脑和客户端不要关。本地任务可以在编辑窗口打开「消息推送到企业微信」：用已经绑好的企微助理，或单独注册一个只收结果的机器人。复用助理的机器人时，绑定方式要选 WebSocket 长连接，URL 回调推不出去。
-
-记忆默认开着，每晚从当天会话里抽一遍，只有自己能看。它是摘要，可能抽偏。概率和规则以账本文件为准。复杂任务、复杂技能消耗的积分更高；这条技能步骤多，周复盘会比一句提醒更费积分。
-
-可以直接上传的懒人包还没有。位置留在 [`workbuddy/`](workbuddy/README.md)，文件随后补上。
+`workbuddy/ai-thinking/` 里的账本、周复盘和 `scripts/brier.py` 是指向上面正本的链接，不要另改一份。`ai-thinking.zip` 里打进去的是文件本身，方便上传。云端任务读不到本机账本，周复盘用本地任务。
 
 ## Cherry Studio
 

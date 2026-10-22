@@ -10,6 +10,7 @@ import io
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -19,7 +20,7 @@ assert spec.loader is not None
 sys.modules["brier"] = brier
 spec.loader.exec_module(brier)
 
-HEADER = "日期,预测,概率,到期,结果,备注\n"
+HEADER = "编号,日期,预测内容,概率,到期日,结果,备注\n"
 
 
 class BrierTests(unittest.TestCase):
@@ -34,52 +35,61 @@ class BrierTests(unittest.TestCase):
 
     def test_known_scores_and_mean(self) -> None:
         path = self.write_csv(
-            "2026-01-01,会发生,0.8,2026-02-01,1,\n"
-            "2026-01-02,不会发生,0.8,2026-02-01,0,\n"
-            "2026-01-03,全对,1,2026-02-01,1,\n"
-            "2026-01-04,全错,0,2026-02-01,1,\n"
+            "A,2026-01-01,会发生,0.8,2026-02-01,1,\n"
+            "B,2026-01-02,不会发生,0.8,2026-02-01,0,\n"
+            "C,2026-01-03,全对,1,2026-02-01,1,\n"
+            "D,2026-01-04,全错,0,2026-02-01,1,\n"
         )
         report = brier.load_and_score(path)
         scores = [round(item.brier, 10) for item in report.resolved]
         self.assertEqual(scores, [0.04, 0.64, 0.0, 1.0])
         self.assertAlmostEqual(report.mean, (0.04 + 0.64 + 0.0 + 1.0) / 4)
+        text = brier.format_report(report)
+        self.assertIn("校准", text)
+        self.assertIn("0.250", text)
 
     def test_skip_example_unresolved_and_words(self) -> None:
         path = self.write_csv(
-            ",示例：不要打分,0.9,2026-12-31,1,示例\n"
-            "2026-03-01,还没到期,0.6,2026-12-31,,\n"
-            "2026-03-02,七成发生,七成,2026-04-01,是,\n"
-            "2026-03-03,百分之二十,20%,2026-04-01,否,\n"
+            "E0,,示例：不要打分,0.9,2026-12-31,1,示例行\n"
+            "E1,2026-03-01,还没到期,0.6,2026-12-31,,\n"
+            "E2,2026-03-02,七成发生,七成,2026-04-01,1,\n"
+            "E3,2026-03-03,百分之二十,20%,2026-04-01,0,\n"
+            "E4,2026-03-04,写成七十分,70,2026-04-01,1,\n"
             "\n"
         )
         report = brier.load_and_score(path)
         self.assertEqual(report.skipped_example, 1)
         self.assertEqual(report.skipped_unresolved, 1)
-        self.assertEqual(len(report.resolved), 2)
+        self.assertEqual(len(report.resolved), 3)
         self.assertAlmostEqual(report.resolved[0].probability, 0.7)
         self.assertAlmostEqual(report.resolved[0].brier, (0.7 - 1) ** 2)
         self.assertAlmostEqual(report.resolved[1].probability, 0.2)
         self.assertEqual(report.resolved[1].outcome, 0.0)
         self.assertAlmostEqual(report.resolved[1].brier, 0.04)
+        self.assertAlmostEqual(report.resolved[2].probability, 0.7)
+        self.assertAlmostEqual(report.resolved[2].brier, 0.09)
 
     def test_template_csv_shape(self) -> None:
         with (HERE / "ledgers" / "predictions.csv").open(encoding="utf-8-sig", newline="") as handle:
             predictions = list(csv.reader(handle))
         with (HERE / "ledgers" / "rules.csv").open(encoding="utf-8-sig", newline="") as handle:
             rules = list(csv.reader(handle))
-        self.assertEqual(predictions[0], ["日期", "预测", "概率", "到期", "结果", "备注"])
+        self.assertEqual(
+            predictions[0],
+            ["编号", "日期", "预测内容", "概率", "到期日", "结果", "备注"],
+        )
         self.assertEqual(len(predictions), 2)
-        self.assertEqual(len(predictions[1]), 6)
-        self.assertTrue(predictions[1][1].startswith("示例"))
-        self.assertEqual(predictions[1][5], "示例")
-        self.assertEqual(predictions[1][4], "")
+        self.assertEqual(len(predictions[1]), 7)
+        self.assertIn("示例", predictions[1][2])
+        self.assertIn("示例", predictions[1][6])
+        self.assertEqual(predictions[1][5], "")
         self.assertEqual(
             rules[0],
-            ["日期", "规则", "证据", "留出数据", "推翻条件", "到期", "验证结果", "备注"],
+            ["编号", "日期", "规则", "证据", "留出数据", "推翻条件", "到期日", "状态", "备注"],
         )
-        self.assertEqual(len(rules[1]), 8)
-        self.assertEqual(rules[1][-1], "示例")
-        self.assertEqual(rules[1][-2], "未验证")
+        self.assertEqual(len(rules[1]), 9)
+        self.assertEqual(rules[1][7], "候选")
+        self.assertIn("示例", rules[1][2])
 
     def test_template_example_is_not_scored(self) -> None:
         report = brier.load_and_score(HERE / "ledgers" / "predictions.csv")
@@ -87,10 +97,10 @@ class BrierTests(unittest.TestCase):
         self.assertIsNone(report.mean)
         self.assertGreaterEqual(report.skipped_example, 1)
         text = brier.format_report(report)
-        self.assertIn("没有已结算的预测", text)
+        self.assertIn("还没有已揭晓的预测", text)
 
     def test_bad_resolved_probability_fails(self) -> None:
-        path = self.write_csv("2026-01-01,写成了七十分,70,2026-02-01,1,\n")
+        path = self.write_csv("X,2026-01-01,概率写坏了,很多,2026-02-01,1,\n")
         with self.assertRaises(brier.LedgerError):
             brier.load_and_score(path)
 
@@ -105,6 +115,45 @@ class BrierTests(unittest.TestCase):
             code = brier.main(["/tmp/does-not-exist-predictions.csv"])
         self.assertEqual(code, 1)
         self.assertIn("找不到文件", err.getvalue())
+
+    def test_workbuddy_pack_matches_canonical(self) -> None:
+        skill = HERE / "workbuddy" / "ai-thinking"
+        self.assertEqual(
+            (skill / "ledgers" / "predictions.csv").resolve(),
+            (HERE / "ledgers" / "predictions.csv").resolve(),
+        )
+        self.assertEqual(
+            (skill / "ledgers" / "rules.csv").resolve(),
+            (HERE / "ledgers" / "rules.csv").resolve(),
+        )
+        self.assertEqual(
+            (skill / "templates" / "weekly-review.md").resolve(),
+            (HERE / "templates" / "weekly-review.md").resolve(),
+        )
+        self.assertEqual(
+            (skill / "scripts" / "brier.py").resolve(),
+            (HERE / "brier.py").resolve(),
+        )
+        archive = HERE / "workbuddy" / "ai-thinking.zip"
+        with zipfile.ZipFile(archive) as bundle:
+            names = set(bundle.namelist())
+            self.assertIn("ai-thinking/SKILL.md", names)
+            self.assertIn("ai-thinking/ledgers/predictions.csv", names)
+            self.assertIn("ai-thinking/scripts/brier.py", names)
+            self.assertEqual(
+                bundle.read("ai-thinking/ledgers/predictions.csv"),
+                (HERE / "ledgers" / "predictions.csv").read_bytes(),
+            )
+            self.assertEqual(
+                bundle.read("ai-thinking/templates/weekly-review.md"),
+                (HERE / "templates" / "weekly-review.md").read_bytes(),
+            )
+            self.assertEqual(
+                bundle.read("ai-thinking/scripts/brier.py"),
+                (HERE / "brier.py").read_bytes(),
+            )
+            info = bundle.getinfo("ai-thinking/scripts/brier.py")
+            self.assertEqual((info.external_attr >> 16) & 0o170000, 0o100000)
 
 
 if __name__ == "__main__":

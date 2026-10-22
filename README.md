@@ -32,7 +32,7 @@
 - **把"做不到"当终点**：删掉一条路后，还要问剩下的部分里有什么能做、能复制。
 - **只学"做了什么"，没学"为什么看得懂"**：复制前先答出"它为什么值钱""什么情况算逻辑破了"。
 - **看到反常的坚持，只在外面挑毛病**：先还原对方逻辑，再自己把对象吃透，两边对照。
-- **停留在任务层**：只看见要交的任务，不问每一项为哪个结果服务。验收能逐条勾完清单，却说不出结果有没有达成。
+- **停留在任务层**（偏离第 6 条；前面已有 5 条）：只看到要交付的任务，没有追问每个任务服务哪个结果。验收能逐条打勾，却说不出结果有没有达成。先写清它服务的结果、怎么知道达成了，按结果验收。
 - **先毛估估，再精算**：宁要模糊的正确，不要精确的错误。
 
 ## 核心原则
@@ -55,7 +55,7 @@
 
 ## 不装技能时
 
-[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 的懒人包还没放进来。
+[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 懒人包在 [`portable/workbuddy/`](portable/workbuddy/安装说明.md)。官方没写明上传包的格式，要等 Tom 实际上传一次才能确认。
 
 [`book-drafts/`](book-drafts/README.md) 是三篇还没上线的书稿，没有链进网站。
 
