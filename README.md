@@ -31,11 +31,14 @@
 - **度量选错**：选好算的指标，而不是回答"用户拿这个结论做什么"的指标（按金额或影响算）。
 - **把"做不到"当终点**：删掉一条路后，还要问剩下的部分里有什么能做、能复制。
 - **只学"做了什么"，没学"为什么看得懂"**：复制前先答出"它为什么值钱""什么情况算逻辑破了"。
+- **看到反常的坚持，只在外面挑毛病**：先还原对方逻辑，再自己把对象吃透，两边对照。
+- **停留在任务层**：只看见要交的任务，不问每一项为哪个结果服务。验收能逐条勾完清单，却说不出结果有没有达成。
 - **先毛估估，再精算**：宁要模糊的正确，不要精确的错误。
 
 ## 核心原则
 
 - **先认清本质，再出方案。**
+- **证伪对着现实，确认对着人**：确认之前，疑问拿数据或小样本去试，不去问人。问人只用于那一次确认。
 - **10x 定方向**：10% 的改进有无限多种，10x 让老办法失效，逼你只留最关键的 20%。
 - **不问"我怎么做"，问"谁来做"**：执行交给 AI，人负责认本质、定目标、做选择。
 - **能做成品就不写描述**，用真实数据挑。
@@ -43,11 +46,18 @@
 - **先删后自动化。**
 - **单向门 / 双向门**：可撤回的 AI 直接做；不可撤回的（花钱、对外发送、删除、上线）攒成一批，让人一次确认。
 - **AI 方案天然趋同**：每个方案单独生成，换数据源和视角。
-- **概率和规则要记账**，到期打分复盘。
+- **概率和规则要记账**，写在工作区的 CSV 或 Markdown 里，到期打分复盘。不靠某个平台的记忆。
 - **不挤牙膏**：开头一次问完，确认本质后一口气跑到底。
 - **独当一面**：问清楚就放手，结果自己担（先自己验证再说做完），分清可逆与不可逆，敢说真话并给替代方案，交付前过"资深行家愿不愿意签名"这一关。
+- **带人时交接本质**：可选模块。交本质、标准和判据，不交切碎的任务。会只留决策会和本质对齐会。一个人加 AI 对整个结果负责。
 
 完整内容见 [`skills/ai-thinking/SKILL.md`](skills/ai-thinking/SKILL.md)。
+
+## 不装技能时
+
+[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 的懒人包还没放进来。
+
+[`book-drafts/`](book-drafts/README.md) 是三篇还没上线的书稿，没有链进网站。
 
 ## 安装
 
@@ -84,6 +94,7 @@ done
 
 ## 更新记录
 
+- 2026-10-22：偏离新增「停留在任务层」。核心原则补上「证伪对着现实，确认对着人」。预测账本和规则账本改为工作区文件。新增可选模块「团队协作」。新增 `portable/`（压缩提示词、账本模板、周复盘、Brier 脚本）。`book-drafts/` 放了三篇未上线书稿。
 - 2026-10-21：新增"做事的气质：独当一面"：问清楚就放手、结果自己担、分清可逆与不可逆、敢说真话、留任测试。
 - 2026-10-21：README 与配套书 v13 明确 AI 思维的价值是让人从繁琐执行中解放出来，更轻松。
 - 2026-10-21：安装脚本改为先备份不删除；新增 WorkBuddy、pi 支持；Codex 直接读 `~/.agents/skills`，去掉多余链接。
@@ -93,6 +104,8 @@ done
 ## English
 
 **AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute end to end. Reversible steps run directly, and irreversible ones are batched for a single approval. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
+
+`portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. Unpublished chapter drafts are in `book-drafts/` and are not linked from the site.
 
 Companion book (Chinese, free): https://ai-era-new-life.vercel.app
 
