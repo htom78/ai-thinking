@@ -34,9 +34,9 @@ python3 portable/brier.py portable/ledgers/predictions.csv
 - [定时任务](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Automation-Guide)
 - [记忆](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Memory)
 
-WorkBuddy 的上传格式还没验证，要等 Tom 实际上传一次才算数。官方文档只写了「选中本地技能包」，没有写明是 zip 还是文件夹，也没有写明 `SKILL.md` 放在哪一层。现在的 zip 里，顶层是 `ai-thinking/` 文件夹，里面是 `SKILL.md` 和 `soul.md`。传失败时按安装说明里的另外两种试法。
+上传格式未经验证，欢迎反馈。官方文档只写了「选中本地技能包」，没有写明是 zip 还是文件夹，也没有写明 `SKILL.md` 放在哪一层。现在的 zip 里，顶层是 `ai-thinking/` 文件夹，里面是 `SKILL.md` 和 `soul.md`。传失败时按安装说明里的另外两种试法。
 
-`workbuddy/ai-thinking/` 里的账本、周复盘和 `scripts/brier.py` 是指向上面正本的链接，不要另改一份。`ai-thinking.zip` 里打进去的是文件本身，方便上传。云端任务读不到本机账本，周复盘用本地任务。
+`workbuddy/ai-thinking/` 里的账本、周复盘和 `scripts/brier.py` 是指向上面正本的链接。`ai-thinking.zip` 里打进去的是文件本身，方便上传。云端任务读不到本机账本，周复盘用本地任务。
 
 ## Cherry Studio
 
@@ -50,7 +50,7 @@ WorkBuddy 的上传格式还没验证，要等 Tom 实际上传一次才算数�
 
 项目做法：新建项目，把 `5-不建GPT的用法.md` 里的提示词贴进项目指令，再上传 `2-知识文件/` 里的文件。中国大陆需要 VPN。
 
-`2-知识文件/ai-thinking-SKILL.md` 是 ChatGPT 专用稿，账本一节改成每次上传 CSV、结束时下载替换。`soul.md`、`predictions.csv`、`rules.csv`、`weekly-review.md`、`brier.py` 指向正本，不要另改一份。安装说明末尾的「尚未确认」仍然有效：这套还没在真实账号里搭过。
+`2-知识文件/ai-thinking-SKILL.md` 是 ChatGPT 专用稿，账本一节改成每次上传 CSV、结束时下载替换。`soul.md`、`predictions.csv`、`rules.csv`、`weekly-review.md`、`brier.py` 指向正本。安装说明末尾列了尚未确认的点，欢迎反馈。
 
 ## 直接贴进对话产品
 
