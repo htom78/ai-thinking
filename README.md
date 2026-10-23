@@ -22,7 +22,7 @@
 
 ### 装到哪里
 
-[`install.sh`](install.sh) 把 `soul.md` 拷到 `~/.agents/soul.md`，并再拷一份到 `~/.agents/skills/ai-thinking/soul.md`。技能软链接会带上技能目录里的这一份。多数工具只自动加载 `SKILL.md`，工作默认要另外放到每次都会读的位置：
+[`install.sh`](install.sh) 把 `soul.md` 拷到 `~/.agents/soul.md`，并再拷一份到 `~/.agents/skills/ai-thinking/soul.md`。技能软链接会带上技能目录里的这一份，但多数工具只自动加载 `SKILL.md`。WorkBuddy 不读技能里的 `soul.md`，只注入个人目录的 `SOUL.md`。工作默认要放到每次都会读的位置：
 
 | 工具 | 放在哪 |
 |---|---|
@@ -30,7 +30,7 @@
 | Cursor | 项目 `.cursor/rules/` 下的 `.mdc`，frontmatter 设 `alwaysApply: true`；或写入项目根目录的 `AGENTS.md` |
 | Codex，以及其他读取 `AGENTS.md` 的代理 | 项目根目录的 `AGENTS.md` |
 | ChatGPT | 贴进项目指令，并作为知识文件上传。步骤见 [`portable/chatgpt/`](portable/chatgpt/安装说明.md) |
-| WorkBuddy | 上传 [`portable/workbuddy/ai-thinking.zip`](portable/workbuddy/ai-thinking.zip)（包内已有 `soul.md`）。官方没写明技能包格式，上传未经验证；若技能只加载 `SKILL.md`，再把 `soul.md` 贴进智能体说明。见 [`portable/workbuddy/`](portable/workbuddy/安装说明.md) |
+| WorkBuddy | `install.sh` 自动写到已有的 `~/.workbuddy/user-<id>-personal/SOUL.md`，原来内容不同的文件备份为同目录的 `SOUL.md.bak-<时间>`。WorkBuddy 只注入这一份，不读技能里的 `soul.md`。新开一个会话后生效。手动：把 `soul.md` 复制覆盖那份 `SOUL.md`。技能可以另外上传 [`ai-thinking.zip`](portable/workbuddy/ai-thinking.zip)。见 [`portable/workbuddy/`](portable/workbuddy/安装说明.md) |
 | 其他（DeepSeek、Kimi、豆包、Claude Projects、Gemini CLI、opencode、pi） | 整段贴进系统提示词或自定义指令。Gemini CLI 读 `GEMINI.md` |
 
 Cursor 的 `.mdc` 文首：
@@ -105,7 +105,7 @@ alwaysApply: true
 
 ## 不装技能时
 
-[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 懒人包在 [`portable/workbuddy/`](portable/workbuddy/安装说明.md)。官方没写明上传包的格式。上传格式未经验证，欢迎反馈。ChatGPT 懒人包在 [`portable/chatgpt/`](portable/chatgpt/安装说明.md)：个人账号用项目；自定义 GPT 只留给 Business / Enterprise / Edu，企业工作区计划 2026-12-11 下线。
+[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 的工作默认由 `install.sh` 写入 `~/.workbuddy/user-<id>-personal/SOUL.md`，见 [`portable/workbuddy/`](portable/workbuddy/安装说明.md)。技能仍可 zip 上传；官方没写明技能包格式，上传格式未经验证，欢迎反馈。ChatGPT 懒人包在 [`portable/chatgpt/`](portable/chatgpt/安装说明.md)：个人账号用项目；自定义 GPT 只留给 Business / Enterprise / Edu，企业工作区计划 2026-12-11 下线。
 
 ## 安装
 
@@ -115,7 +115,7 @@ alwaysApply: true
 curl -fsSL https://raw.githubusercontent.com/htom78/ai-thinking/main/install.sh | bash
 ```
 
-安装脚本会把技能放到 `~/.agents/skills/ai-thinking`（已是 git 仓库则 `git pull` 更新），并把 `soul.md` 装到 `~/.agents/soul.md` 和技能目录里，再给各工具建软链接。**不会删除任何东西**：遇到旧目录、实体残留，或已有且内容不同的 `soul.md`，先移到 `~/.Trash/` 备份。
+安装脚本会把技能放到 `~/.agents/skills/ai-thinking`（已是 git 仓库则 `git pull` 更新），并把 `soul.md` 装到 `~/.agents/soul.md` 和技能目录里，再给各工具建软链接。已有 `~/.workbuddy/user-*-personal/` 时，把同一份写入其中的 `SOUL.md`。**不会删除任何东西**：遇到旧目录、实体残留，或已有且内容不同的 `~/.agents/soul.md`，先移到 `~/.Trash/` 备份。WorkBuddy 里内容不同的 `SOUL.md` 备份为同目录的 `SOUL.md.bak-<时间>`。没有那个个人目录就跳过，不会新建。
 
 手动安装：
 
@@ -125,6 +125,8 @@ mkdir -p ~/.agents/skills
 cp -R ai-thinking/skills/ai-thinking ~/.agents/skills/
 cp ai-thinking/soul.md ~/.agents/soul.md
 cp ai-thinking/soul.md ~/.agents/skills/ai-thinking/soul.md
+# WorkBuddy：复制覆盖已有的 ~/.workbuddy/user-<id>-personal/SOUL.md。没有该目录则不要新建。
+# 原文件内容不同时，先改名为同目录的 SOUL.md.bak-<时间>。
 for d in ~/.workbuddy/skills ~/.claude/skills ~/.cursor/skills ~/.gemini/skills ~/.config/opencode/skills ~/.pi/agent/skills; do
   mkdir -p "$d" && ln -sfn ~/.agents/skills/ai-thinking "$d/ai-thinking"
 done
@@ -144,6 +146,7 @@ done
 
 ## 更新记录
 
+- 2026-10-23：`install.sh` 把 `soul.md` 写入已有的 `~/.workbuddy/user-*-personal/SOUL.md`（内容不同则备份为同目录 `SOUL.md.bak-<时间>`，不删除、不新建目录）。WorkBuddy 只注入这一份，不读技能里的 `soul.md`；新开一个会话后生效。zip 只用来装技能。
 - 2026-10-23：README 增加「怎么用 soul.md」：各工具的放置位置、一分钟自检，以及把教训收成新规则。用例 001 的有无对照仍是不加 2/12、加上 8/12。
 - 2026-10-23：第 8 条写明每个问题都要有默认答案，不能把「等你」当作默认，也不为凑决策单去问代价低的问题；等人回答时先做和答案无关的部分，不要整体停工。第 15 条只向人汇报结果和真正要拍板的事，有权限的可撤回操作自己做完。001 第三次用十六条 soul.md 为 11/12（按摘要打分，可能偏高）。WorkBuddy 上传格式未经验证，欢迎反馈。
 - 2026-10-23：「找唯一约束」从第 2 条拆出，单独成第 3 条。其后顺延，现为十六条。保护注意力的是第 7、8 条（只在分歧点问、攒成一批）。
@@ -166,7 +169,7 @@ done
 
 **AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute to a written spec. It asks at divergence points, not about details (at most one to three questions, each with a default). Reversible steps run at the earned autonomy level (L1–L3); irreversible ones are batched for a single approval. Deliverables carry evidence mapped to acceptance criteria, and an independent verifier, not the author, tries to break them. Probability estimates go into one CSV ledger shared by all tools (default `~/.agents/memory/ledgers/predictions.csv`) and are scored with the bundled `scripts/brier.py`. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
 
-`soul.md` is a short, always-on working default of sixteen rules (installed to `~/.agents/soul.md` as well as the skill directory). Real failures used to compare the first reply with and without it are in `evals/` (case 001: 2/12 without, 8/12 with). Per-tool file locations, a one-minute check, and how to add your own rules are in 「怎么用 soul.md」. The eight-step skill runs only for large tasks and still follows `soul.md`. `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. The ChatGPT and WorkBuddy packs include `soul.md` and a skill text aligned with `skills/ai-thinking/SKILL.md`.
+`soul.md` is a short, always-on working default of sixteen rules (installed to `~/.agents/soul.md` as well as the skill directory). WorkBuddy injects only `~/.workbuddy/user-<id>-personal/SOUL.md`: `install.sh` writes that file when the directory already exists, backs up a different original beside it, and a new session picks it up. A zip upload only installs the skill. Real failures used to compare the first reply with and without it are in `evals/` (case 001: 2/12 without, 8/12 with). Per-tool file locations, a one-minute check, and how to add your own rules are in 「怎么用 soul.md」. The eight-step skill runs only for large tasks and still follows `soul.md`. `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. The ChatGPT pack includes `soul.md`. The WorkBuddy zip is only an alternative way to install the skill.
 
 Companion book (Chinese, free): https://ai-era-new-life.vercel.app
 
