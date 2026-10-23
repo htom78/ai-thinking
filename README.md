@@ -16,7 +16,7 @@
 
 [`soul.md`](soul.md) 是一层更轻的工作默认：像一个成熟的资深工程师那样做事。工作默认始终生效。八步流程只在大任务时触发，触发之后仍然遵守 `soul.md`。这一层可以单独使用，整段粘贴到系统提示、`AGENTS.md` 或自定义指令里即可。
 
-正文按四个阶段写：动手前、要人决策时、执行中、收尾。共同目标是让「返工的代价 + 占用人注意力的代价」之和最小。
+正文十六条，分四个阶段：动手前、要人决策时、执行中、收尾。共同目标是让「返工的代价 + 占用人注意力的代价」之和最小。人加 AI 时，约束几乎总是人的注意力。
 
 用真实翻车看第一次回复有没有差别：[`evals/`](evals/README.md)。
 
@@ -123,6 +123,9 @@ done
 
 ## 更新记录
 
+- 2026-10-23：「找唯一约束」从第 2 条拆出，单独成第 3 条。其后顺延，现为十六条。保护注意力的是第 7、8 条（只在分歧点问、攒成一批）。
+- 2026-10-23：工作默认现为十六条。人加 AI 时约束几乎总是人的注意力，第 7、8 条保护它。第 3 条找唯一约束。第 4 条「先看真东西」。第 6 条的检查要自己能跑。第 12 条先删再优化。第 16 条做完把经验收成下次能直接用的东西。
+- 2026-10-23：第 2 条在选定格式或工具之前，先问或先查用户已经在用的工具和流水线。第 11 条写明第一个产出是最终交付形态的最小可运行切片，而不是关于它的文档。001 用例记下当次分数：加 soul.md 为 8/12，不加为 2/12。
 - 2026-10-23：新增 [`evals/`](evals/README.md)。同一句原始请求分别在不加 `soul.md` 和加 `soul.md` 下看第一次回复和第一个产出，打分对照 `soul.md` 条目，由没有生成答案的一方来做。第一条用例是视频效果拆解。
 - 2026-10-23：工作默认把「攒成一批，一次决策」和「记决策日志」分成两条。独立验收只用于不可逆、对外可见或返工代价大的交付，小事附上证据即可。
 - 2026-10-23：新增工作默认 `soul.md`。始终生效，可单独粘贴；八步流程只在大任务时触发。按四个阶段写：动手前、要人决策时、执行中、收尾。总原则是让返工的代价与占用注意力的代价之和最小。要人决策时攒成一批，并维护决策日志（已拍板、按默认先推进、待决定）。`install.sh` 默认安装到 `~/.agents/soul.md` 和技能目录。ChatGPT、WorkBuddy 懒人包同步该文件，并把技能副本对齐到当前 `SKILL.md`。
@@ -140,7 +143,7 @@ done
 
 **AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute to a written spec. It asks at divergence points, not about details (at most one to three questions, each with a default). Reversible steps run at the earned autonomy level (L1–L3); irreversible ones are batched for a single approval. Deliverables carry evidence mapped to acceptance criteria, and an independent verifier, not the author, tries to break them. Probability estimates go into one CSV ledger shared by all tools (default `~/.agents/memory/ledgers/predictions.csv`) and are scored with the bundled `scripts/brier.py`. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
 
-`soul.md` is a short, always-on working default (installed to `~/.agents/soul.md` as well as the skill directory). Real failures used to compare the first reply with and without it are in `evals/`. Paste it into a system prompt, `AGENTS.md`, or custom instructions; the eight-step skill runs only for large tasks and still follows `soul.md`. `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. The ChatGPT and WorkBuddy packs include `soul.md` and a skill text aligned with `skills/ai-thinking/SKILL.md`. Unpublished chapter drafts are in `book-drafts/` and are not linked from the site.
+`soul.md` is a short, always-on working default of sixteen rules (installed to `~/.agents/soul.md` as well as the skill directory). Real failures used to compare the first reply with and without it are in `evals/`. Paste it into a system prompt, `AGENTS.md`, or custom instructions; the eight-step skill runs only for large tasks and still follows `soul.md`. `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. The ChatGPT and WorkBuddy packs include `soul.md` and a skill text aligned with `skills/ai-thinking/SKILL.md`. Unpublished chapter drafts are in `book-drafts/` and are not linked from the site.
 
 Companion book (Chinese, free): https://ai-era-new-life.vercel.app
 

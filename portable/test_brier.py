@@ -134,6 +134,10 @@ class BrierTests(unittest.TestCase):
             (skill / "scripts" / "brier.py").resolve(),
             (HERE / "brier.py").resolve(),
         )
+        self.assertEqual(
+            (skill / "soul.md").resolve(),
+            (HERE.parent / "soul.md").resolve(),
+        )
         archive = HERE / "workbuddy" / "ai-thinking.zip"
         with zipfile.ZipFile(archive) as bundle:
             names = set(bundle.namelist())
@@ -151,6 +155,11 @@ class BrierTests(unittest.TestCase):
             self.assertEqual(
                 bundle.read("ai-thinking/scripts/brier.py"),
                 (HERE / "brier.py").read_bytes(),
+            )
+            self.assertIn("ai-thinking/soul.md", names)
+            self.assertEqual(
+                bundle.read("ai-thinking/soul.md"),
+                (HERE.parent / "soul.md").read_bytes(),
             )
             info = bundle.getinfo("ai-thinking/scripts/brier.py")
             self.assertEqual((info.external_attr >> 16) & 0o170000, 0o100000)
@@ -170,10 +179,14 @@ class BrierTests(unittest.TestCase):
             (HERE / "templates" / "weekly-review.md").resolve(),
         )
         self.assertEqual((folder / "brier.py").resolve(), (HERE / "brier.py").resolve())
+        self.assertEqual(
+            (folder / "soul.md").resolve(),
+            (HERE.parent / "soul.md").resolve(),
+        )
         skill = folder / "ai-thinking-SKILL.md"
         self.assertFalse(skill.is_symlink())
         text = skill.read_text(encoding="utf-8")
-        self.assertIn("账本存成 CSV 文件（ChatGPT 版）", text)
+        self.assertIn("ChatGPT 的记忆是自动摘要", text)
         self.assertIn("供用户下载", text)
         main = (HERE.parent / "skills" / "ai-thinking" / "SKILL.md").read_text(encoding="utf-8")
         def deviation(source: str) -> str:
