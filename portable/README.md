@@ -28,13 +28,13 @@ python3 portable/brier.py portable/ledgers/predictions.csv
 
 ## WorkBuddy（腾讯）
 
-懒人包在 [`workbuddy/`](workbuddy/安装说明.md)。按 `安装说明.md` 做：上传 `ai-thinking.zip`，把账本拷进工作空间，再建每周复盘。文档：
+懒人包在 [`workbuddy/`](workbuddy/安装说明.md)。工作默认只来自 `~/.workbuddy/user-<id>-personal/SOUL.md`：`install.sh` 会写到已经存在的这个文件，原来内容不同就在同目录备份；新开一个会话后生效。手动则把 `soul.md` 复制覆盖那份 `SOUL.md`。技能可以另外上传 `ai-thinking.zip`，再把账本拷进工作空间，再建每周复盘。文档：
 
 - [技能](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Skills-Market)
 - [定时任务](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Automation-Guide)
 - [记忆](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Memory)
 
-上传格式未经验证，欢迎反馈。官方文档只写了「选中本地技能包」，没有写明是 zip 还是文件夹，也没有写明 `SKILL.md` 放在哪一层。现在的 zip 里，顶层是 `ai-thinking/` 文件夹，里面是 `SKILL.md` 和 `soul.md`。传失败时按安装说明里的另外两种试法。
+技能包的上传格式未经验证，欢迎反馈。官方文档只写了「选中本地技能包」，没有写明是 zip 还是文件夹，也没有写明 `SKILL.md` 放在哪一层。zip 只用于技能。现在的 zip 里，顶层是 `ai-thinking/` 文件夹，里面是 `SKILL.md` 和 `soul.md`；WorkBuddy 不读技能里的 `soul.md`。传失败时按安装说明里的另外两种试法。
 
 `workbuddy/ai-thinking/` 里的账本、周复盘和 `scripts/brier.py` 是指向上面正本的链接。`ai-thinking.zip` 里打进去的是文件本身，方便上传。云端任务读不到本机账本，周复盘用本地任务。
 
