@@ -82,9 +82,7 @@
 
 ## 不装技能时
 
-[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 懒人包在 [`portable/workbuddy/`](portable/workbuddy/安装说明.md)。官方没写明上传包的格式，要等 Tom 实际上传一次才能确认。ChatGPT 懒人包在 [`portable/chatgpt/`](portable/chatgpt/安装说明.md)：个人账号用项目；自定义 GPT 只留给 Business / Enterprise / Edu，企业工作区计划 2026-12-11 下线。
-
-[`book-drafts/`](book-drafts/README.md) 是三篇还没上线的书稿，没有链进网站。
+[`portable/`](portable/README.md) 给没有 Grok Bot 的团队：一段可粘贴的提示词，CSV 账本模板，周复盘模板，以及一个只用 Python 标准库的 Brier 打分脚本。WorkBuddy、Cherry Studio、ChatGPT、DeepSeek、Kimi、豆包、Claude Projects，以及 Dify、Coze Studio、n8n 的接法都写在那里。WorkBuddy 懒人包在 [`portable/workbuddy/`](portable/workbuddy/安装说明.md)。官方没写明上传包的格式。上传格式未经验证，欢迎反馈。ChatGPT 懒人包在 [`portable/chatgpt/`](portable/chatgpt/安装说明.md)：个人账号用项目；自定义 GPT 只留给 Business / Enterprise / Edu，企业工作区计划 2026-12-11 下线。
 
 ## 安装
 
@@ -123,6 +121,7 @@ done
 
 ## 更新记录
 
+- 2026-10-23：第 8 条写明每个问题都要有默认答案，不能把「等你」当作默认，也不为凑决策单去问代价低的问题；等人回答时先做和答案无关的部分，不要整体停工。第 15 条只向人汇报结果和真正要拍板的事，有权限的可撤回操作自己做完。001 第三次用十六条 soul.md 为 11/12（按摘要打分，可能偏高）。WorkBuddy 上传格式未经验证，欢迎反馈。
 - 2026-10-23：「找唯一约束」从第 2 条拆出，单独成第 3 条。其后顺延，现为十六条。保护注意力的是第 7、8 条（只在分歧点问、攒成一批）。
 - 2026-10-23：工作默认现为十六条。人加 AI 时约束几乎总是人的注意力，第 7、8 条保护它。第 3 条找唯一约束。第 4 条「先看真东西」。第 6 条的检查要自己能跑。第 12 条先删再优化。第 16 条做完把经验收成下次能直接用的东西。
 - 2026-10-23：第 2 条在选定格式或工具之前，先问或先查用户已经在用的工具和流水线。第 11 条写明第一个产出是最终交付形态的最小可运行切片，而不是关于它的文档。001 用例记下当次分数：加 soul.md 为 8/12，不加为 2/12。
@@ -132,7 +131,7 @@ done
 - 2026-10-23：新增核心原则「一次只攻一个约束」（约束理论，Goldratt《The Goal》1984）；第 6 步复盘每周固定问「现在的约束是什么、有没有移动」。
 - 2026-10-22：问在分歧点、不问在细节上：三种必须问的情况、问前自检、问后写成规格再执行，提示词前缀同步修改。独当一面改为交证据、独立验证者不自评分、责任在人；留任测试改名为签名测试，由验证者回答。新增「按级放权」（L1 新手 / L2 胜任 / L3 资深）：可逆与否和放手多大分开看。
 - 2026-10-22：写明预测账本约定：默认 `~/.agents/memory/ledgers/predictions.csv`、固定列、`outcome` 只填 空/0/1/void、写下后不改判断本身；技能自带 `scripts/brier.py` 打分。
-- 2026-10-22：偏离新增「停留在任务层」（第 6 条，原有第 5 条保留）。核心原则补上「证伪对着现实，确认对着人」。预测账本和规则账本改为工作区文件。新增可选模块「团队协作」。新增 `portable/`（压缩提示词、账本模板、周复盘、Brier 脚本）、WorkBuddy 懒人包和 ChatGPT 懒人包。账本、周复盘、打分脚本只留一份正本。`book-drafts/` 放了三篇未上线书稿。WorkBuddy 上传格式、ChatGPT 这套用法都还没在真实账号里验证。个人账号用 ChatGPT 项目；自定义 GPT 计划下线（企业工作区 2026-12-11）。
+- 2026-10-22：偏离新增「停留在任务层」（第 6 条，原有第 5 条保留）。核心原则补上「证伪对着现实，确认对着人」。预测账本和规则账本改为工作区文件。新增可选模块「团队协作」。新增 `portable/`（压缩提示词、账本模板、周复盘、Brier 脚本）、WorkBuddy 懒人包和 ChatGPT 懒人包。账本、周复盘、打分脚本只留一份正本。WorkBuddy 上传格式、ChatGPT 这套用法当时都未经验证。个人账号用 ChatGPT 项目；自定义 GPT 计划下线（企业工作区 2026-12-11）。
 - 2026-10-21：新增"做事的气质：独当一面"：问清楚就放手、结果自己担、分清可逆与不可逆、敢说真话、留任测试。
 - 2026-10-21：README 与配套书 v13 明确 AI 思维的价值是让人从繁琐执行中解放出来，更轻松。
 - 2026-10-21：安装脚本改为先备份不删除；新增 WorkBuddy、pi 支持；Codex 直接读 `~/.agents/skills`，去掉多余链接。
@@ -143,7 +142,7 @@ done
 
 **AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute to a written spec. It asks at divergence points, not about details (at most one to three questions, each with a default). Reversible steps run at the earned autonomy level (L1–L3); irreversible ones are batched for a single approval. Deliverables carry evidence mapped to acceptance criteria, and an independent verifier, not the author, tries to break them. Probability estimates go into one CSV ledger shared by all tools (default `~/.agents/memory/ledgers/predictions.csv`) and are scored with the bundled `scripts/brier.py`. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
 
-`soul.md` is a short, always-on working default of sixteen rules (installed to `~/.agents/soul.md` as well as the skill directory). Real failures used to compare the first reply with and without it are in `evals/`. Paste it into a system prompt, `AGENTS.md`, or custom instructions; the eight-step skill runs only for large tasks and still follows `soul.md`. `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. The ChatGPT and WorkBuddy packs include `soul.md` and a skill text aligned with `skills/ai-thinking/SKILL.md`. Unpublished chapter drafts are in `book-drafts/` and are not linked from the site.
+`soul.md` is a short, always-on working default of sixteen rules (installed to `~/.agents/soul.md` as well as the skill directory). Real failures used to compare the first reply with and without it are in `evals/`. Paste it into a system prompt, `AGENTS.md`, or custom instructions; the eight-step skill runs only for large tasks and still follows `soul.md`. `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. The ChatGPT and WorkBuddy packs include `soul.md` and a skill text aligned with `skills/ai-thinking/SKILL.md`.
 
 Companion book (Chinese, free): https://ai-era-new-life.vercel.app
 
