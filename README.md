@@ -14,7 +14,7 @@
 
 八步流程很重，只在大任务（目标、项目、难题、人生决策）时触发。日常小任务不走八步。
 
-[`soul.md`](soul.md) 始终生效，可以单独使用。八步流程只在大任务时触发，触发之后仍然遵守 `soul.md`。正文十六条，分四个阶段：动手前、要人决策时、执行中、收尾。怎么装、怎么确认生效、怎么按自己的经验改，见下一节。
+[`soul.md`](soul.md) 始终生效，可以单独使用。八步流程只在大任务时触发，触发之后仍然遵守 `soul.md`。正文十七条，分四个阶段：动手前、要人决策时、执行中、收尾。怎么装、怎么确认生效、怎么按自己的经验改，见下一节。
 
 ## 怎么用 soul.md
 
@@ -146,6 +146,7 @@ done
 
 ## 更新记录
 
+- 2026-10-24：`soul.md` 新增第 17 条「极限版」（接在第 16 条后，不改动其余编号，现为十七条）。目标不明确或人在探新方向时，除了稳妥版再附一个把假设放到最松的极限版：写明能做到什么、卡在哪、哪个假设来自惯例；要真试过或有证据，标明是极限版，不替人选；目标已清楚、只要稳妥执行时不用。目的是让人保持开眼界，不被惯例磨平。WorkBuddy 的 zip 同步。
 - 2026-10-24：`soul.md` 仍是十六条，内容并入已有条目。第 2 条加「再看宽一步」：用动词重述任务，问哪几个领域的方法能帮上忙，只借方法和工具，不角色扮演。第 4 条加：用专业人真正用的工具和方法，不只是换成专业口吻（例如分析数据用数据库或统计方法，别停在 markdown 表格）。第 14 条加：觉得「不可能」时当成待检验的假设，先问成立需要什么条件、哪个假设来自惯例，做最小切片真去试；试过仍做不到，再附证据说明已验证到哪一步和差距，不凭印象说不可能。WorkBuddy 的 zip 同步了新的 `soul.md`。评测用例 001 的分数是上一版条文的当次结果，没有重跑。
 - 2026-10-23：`install.sh` 把 `soul.md` 写入已有的 `~/.workbuddy/user-*-personal/SOUL.md`（内容不同则备份为同目录 `SOUL.md.bak-<时间>`，不删除、不新建目录）。WorkBuddy 只注入这一份，不读技能里的 `soul.md`；新开一个会话后生效。zip 只用来装技能。
 - 2026-10-23：README 增加「怎么用 soul.md」：各工具的放置位置、一分钟自检，以及把教训收成新规则。用例 001 的有无对照仍是不加 2/12、加上 8/12。
@@ -170,7 +171,7 @@ done
 
 **AI思维 (ai-thinking)** is an Agent Skill for AI-era problem solving. It first grasps the essence of a problem (step 0.5: locate the level, generate ≥3 competing explanations with probabilities, run discriminating tests on held-out data before confirming (falsify first), and condense the result into a few rules confirmed **once** with the user). It then sets a 10x goal, defines the evaluation criteria before generating, produces genuinely different options, eliminates strictly, and lets AI execute to a written spec. It asks at divergence points, not about details (at most one to three questions, each with a default). Reversible steps run at the earned autonomy level (L1–L3); irreversible ones are batched for a single approval. Deliverables carry evidence mapped to acceptance criteria, and an independent verifier, not the author, tries to break them. Probability estimates go into one CSV ledger shared by all tools (default `~/.agents/memory/ledgers/predictions.csv`) and are scored with the bundled `scripts/brier.py`. Install with the one-liner above, or clone the repo into `~/.agents/skills` and symlink it for Claude Code, Cursor, Gemini CLI, opencode, WorkBuddy and pi (Codex reads `~/.agents/skills` directly). Existing directories are backed up to `~/.Trash`, never deleted.
 
-`soul.md` is a short, always-on working default of sixteen rules (installed to `~/.agents/soul.md` as well as the skill directory). WorkBuddy injects only `~/.workbuddy/user-<id>-personal/SOUL.md`: `install.sh` writes that file when the directory already exists, backs up a different original beside it, and a new session picks it up. A zip upload only installs the skill. Real failures used to compare the first reply with and without it are in `evals/` (case 001: 2/12 without, 8/12 with). Per-tool file locations, a one-minute check, and how to add your own rules are in 「怎么用 soul.md」. The eight-step skill runs only for large tasks and still follows `soul.md`. `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. The ChatGPT pack includes `soul.md`. The WorkBuddy zip is only an alternative way to install the skill.
+`soul.md` is a short, always-on working default of seventeen rules (installed to `~/.agents/soul.md` as well as the skill directory). WorkBuddy injects only `~/.workbuddy/user-<id>-personal/SOUL.md`: `install.sh` writes that file when the directory already exists, backs up a different original beside it, and a new session picks it up. A zip upload only installs the skill. Real failures used to compare the first reply with and without it are in `evals/` (case 001: 2/12 without, 8/12 with). Per-tool file locations, a one-minute check, and how to add your own rules are in 「怎么用 soul.md」. The eight-step skill runs only for large tasks and still follows `soul.md`. `portable/` is for teams not using Grok Bot: a model-agnostic prompt, file-based ledgers, a weekly-review template, and a dependency-free Brier script. The ChatGPT pack includes `soul.md`. The WorkBuddy zip is only an alternative way to install the skill.
 
 Companion book (Chinese, free): https://ai-era-new-life.vercel.app
 
