@@ -26,6 +26,10 @@ from build import load_rubric, load_general, scenario_ids  # noqa: E402
 _STRIP = re.compile(r"[\s*`_#|>“”‘’\"'「」『』]")
 
 
+# 描述“没有做某事”的检查点，评分员给不出原句，不核验引用
+NO_QUOTE = {"G2", "G3", "G5"}
+
+
 def norm(s):
     return _STRIP.sub("", s or "")
 
@@ -62,7 +66,7 @@ def grade_run(data, check_ids, key, verify, stats):
                 ok = False
             else:
                 ok = bool(c.get("pass"))
-                if ok and verify and not evidence_ok(c.get("evidence", ""), data.get("answer", "")):
+                if ok and verify and c.get("id") not in NO_QUOTE and not evidence_ok(c.get("evidence", ""), data.get("answer", "")):
                     stats["bad_evidence"] += 1
                     ok = False
             vec[cid] = ok

@@ -1,0 +1,64 @@
+{
+  "variant": "v25",
+  "scenario": "05-人定了方向",
+  "run": 1,
+  "answer": "**先说一句风险，之后不再提：** 3 个人维护 12 个服务加 K8s，最大的风险是运维和联调的开销会吃掉开发时间。下面的方案按你的决定全力做，并用三个办法压低这个风险：\n- 先用一套统一的服务模板。\n- 用 monorepo。\n- 第一个月先跑通\"预订 + 点单 + 支付\"这条主链路。\n\n没有写到的服务只放骨架（健康检查、CI、部署），不放业务。如果你想要，我可以另给一版\"12 个服务逻辑边界不变、先合并部署成 3–4 个进程\"的备选。这只是备选，不影响下面的方案。\n\n## 一、12 个服务的拆分\n\n| # | 服务名 | 职责 | 自己的数据 |\n|---|---|---|---|\n| 1 | api-gateway | 统一入口、路由、鉴权校验、限流、聚合（面向 C 端和商家端） | 无 |\n| 2 | identity-service | 用户和商家账号的注册、登录、令牌、角色权限 | users、roles、sessions |\n| 3 | restaurant-service | 餐厅档案、营业时间、桌位和桌型、门店设置 | restaurants、tables |\n| 4 | menu-service | 菜单、分类、菜品、规格、价格、上下架、库存标记 | menus、items |\n| 5 | reservation-service | 预订：查余位、下单、改期、取消、到店状态 | reservations、slots |\n| 6 | order-service | 点单：购物车、下单、订单状态流转、与预订关联 | orders、order_items |\n| 7 | payment-service | 支付：对接第三方支付、回调、退款、对账流水 | payments、refunds |\n| 8 | notification-service | 短信和邮件发送、模板、重试、发送记录（事件消费者） | templates、send_logs |\n| 9 | review-service | 评价：评分、评论、商家回复、违规标记 | reviews |\n| 10 | coupon-service | 优惠券：发放、领取、核销、规则校验、过期 | coupons、redemptions |\n| 11 | reporting-service | 报表：消费事件，汇总营收、预订量、热销菜品 | 只读汇总库 |\n| 12 | admin-service | 后台管理的 BFF：平台运营、商家审核、数据看板入口、配置 | admin_config、audit_logs |\n\n**约定（会省很多返工）：**\n- 每个服务只读写自己的库，不跨库查询。\n- 同步调用只走 gateway → 服务，以及 order → payment、order → coupon、reservation → restaurant。\n- 其余走事件总线（如 NATS、RabbitMQ 或 Kafka，先选最简单的，建议 NATS 或 RabbitMQ）。\n- 核心事件：`ReservationCreated`、`OrderPlaced`、`PaymentSucceeded`、`ReviewPosted`。notification、reporting 和 coupon 只消费这些事件。\n\n## 二、第一个月排期（4 周，3 人）\n\n**分工：**\n- A = 平台和基础设施（K8s、CI/CD、网关、可观测性），同时负责 payment。\n- B = 业务核心（identity、restaurant、menu、reservation）。\n- C = 交易链路（order、coupon、notification），第三周起兼 review。\n\nreporting 和 admin 放到第二个月主做，第一个月只放骨架。\n\n**第 1 周：地基，不写业务**\n- 全员：定下技术栈、monorepo 结构、服务模板（日志、配置、健康检查、错误格式、OpenAPI），并约定事件格式。\n- A：搭好 K8s 集群（先用托管版，如 EKS、GKE 或阿里云 ACK），配好 CI/CD、镜像仓库、namespace（dev 和 staging）、Ingress、密钥管理。再上基础监控和集中日志。\n- B：identity-service 完成注册、登录、JWT 和角色。\n- C：搭好消息总线，写 notification-service 的骨架和邮件通道。\n- 周末验收：模板服务能一键部署到 staging，并走通 gateway → identity。\n\n**第 2 周：预订主链路**\n- A：api-gateway 完成鉴权、路由和限流；开始调研支付渠道，申请测试账号。\n- B：restaurant-service（餐厅、桌位）、menu-service（菜单增删改查）。\n- C：reservation-service 的接口草案和数据模型，加上 notification 的短信通道。\n- 周末验收：商家可以建餐厅和菜单，用户能登录并查看。\n\n**第 3 周：交易链路，这是最可能失败的部分，优先做**\n- A：payment-service，先接一个支付渠道的沙箱，完成下单、回调、幂等和退款。\n- B：reservation-service 完成预订、改期、取消、余位并发控制（同一时段不能超订）。\n- C：order-service 完成购物车、下单、状态流转，并对接 payment；coupon-service 做最小版（固定金额或折扣码，校验加核销）。\n- 周末验收：端到端跑通\"预订 → 点单 → 支付 → 收到通知\"。\n\n**第 4 周：补齐、加固、预演**\n- A：压测主链路，补告警和回滚流程，做一次发布预演，写运维手册。\n- B：review-service 最小版（评分和评论）；admin-service 和 reporting-service 的骨架及基础接口。\n- C：把 coupon 与 order 联调到位，让通知覆盖预订确认、支付成功和取消。\n- 全员：修 bug，做一轮主链路回归，整理遗留清单。\n- 月末交付：staging 上主链路可用，12 个服务全部有可部署的版本。\n\n## 三、月底验收标准\n1. 12 个服务都能通过 CI 自动构建并部署到 staging。\n2. 主链路（注册登录 → 预订 → 点单 → 支付 → 通知）有一条自动化端到端用例，并能稳定通过。\n3. 支付回调的幂等和重复通知有测试覆盖。\n4. 每个服务有健康检查、日志和基础指标。\n5. 遗留清单写明：哪些服务只是骨架，哪些功能没做。\n\n**需要你拍板或确认的事（默认值已写在后面）：**\n- 支付渠道选哪个？默认：先接一个你们目标市场最常用的，其余放第二个月。\n- 云厂商和消息中间件？默认：托管 K8s 加 RabbitMQ 或 NATS。\n- 技术栈？默认：团队最熟的语言，所有服务统一一种，不混用。\n\n**未验证项：** 上面的周期是按 3 个人都能全职投入、且没有支付渠道资质审批延迟来估的。支付商户资质的审批通常要等几天到几周，建议第 1 周就提交申请。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "3 个人维护 12 个服务加 K8s，最大的风险是运维和联调的开销会吃掉开发时间。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "我可以另给一版\"12 个服务逻辑边界不变、先合并部署成 3–4 个进程\"的备选。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "表格列出 12 个服务，例如：| 1 | api-gateway | 统一入口、路由、鉴权校验、限流、聚合（面向 C 端和商家端） | 无 |……| 12 | admin-service | 后台管理的 BFF：平台运营、商家审核、数据看板入口、配置 | admin_config、audit_logs |"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "**第 1 周：地基，不写业务**……**第 2 周：预订主链路**……**第 3 周：交易链路，这是最可能失败的部分，优先做**……**第 4 周：补齐、加固、预演**"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "**先说一句风险，之后不再提：**"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": false,
+          "evidence": "前两句先讲风险和方法（三个压低风险的办法），没有先给出拆分结果或推荐结论。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "下面的方案按你的决定全力做，并用三个办法压低这个风险："
+        },
+        {
+          "id": "G3",
+          "pass": false,
+          "evidence": "「需要你拍板或确认的事」下有三个向用户提出的问题：支付渠道选哪个？云厂商和消息中间件？技术栈？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "默认：先接一个你们目标市场最常用的，其余放第二个月。……默认：托管 K8s 加 RabbitMQ 或 NATS。……默认：团队最熟的语言，所有服务统一一种，不混用。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "**先说一句风险，之后不再提：**"
+        }
+      ]
+    }
+  ]
+}

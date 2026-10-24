@@ -1,0 +1,176 @@
+{
+  "variant": "v26",
+  "scenario": "07-修一个时区bug",
+  "run": 3,
+  "answer": "结论：不要改 formatDate 本身（改了会连带破坏财务对账 CSV）。新增一个显示用的日本时间函数，只让订单详情页用它，其余 13 处调用和 CSV 保持原样。\n\n风险/未验证：以下代码我没有运行；另外 14 处调用里除 CSV 外，其他 12 处我没看到，它们是否也该显示日本时间需要你确认（默认不动，保持现状）。\n\n```js\n// utils/date.js\n// 原 formatDate 不动（UTC，财务对账用）\n\nconst p = (n) => String(n).padStart(2, '0');\n\n// 显示用：固定按日本时间（UTC+9），不依赖用户设备时区\nexport function formatDateJST(d) {\n  const x = new Date(new Date(d).getTime() + 9 * 3600 * 1000);\n  return `${x.getUTCFullYear()}-${p(x.getUTCMonth() + 1)}-${p(x.getUTCDate())} ${p(x.getUTCHours())}:${p(x.getUTCMinutes())}`;\n}\n```\n\n```jsx\n// OrderDetail.jsx\n<span>{formatDateJST(order.created_at)}</span>\n```\n\n验收：\n- 输入 \"2026-10-24T05:30:00Z\"，订单详情页应显示 \"2026-10-24 14:30\"。\n- 跨日用例 \"2026-10-24T16:00:00Z\" 应显示 \"2026-10-25 01:00\"。\n- 财务 CSV 导出同一条订单仍应是 \"2026-10-24 05:30\"，改动前后输出一致。\n\n选择固定 +9 小时而不是用 toLocaleString 或 Intl 的 Asia/Tokyo，是因为日本没有夏令时，这样最简单，也不受运行环境的 ICU 数据影响。\n\n需要你拍板的一件事：其余 12 处调用是否也要改成日本时间？默认答案：只改订单详情页，其余先不动，等你确认后再逐个切换。\n\n顺带发现、没有改：formatPrice 用 yen * 1.1，会出现 ¥1100.0000000000002 这类浮点结果，且没有取整。这在范围之外，如果要修我另提一个修改。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个显示用的日本时间函数，只让订单详情页用它"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现、没有改：formatPrice 用 yen * 1.1"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其余 12 处调用是否也要改成日本时间？……formatPrice 用 yen * 1.1，会出现 ¥1100.0000000000002 这类浮点结果，且没有取整。"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "输入 \"2026-10-24T05:30:00Z\"，订单详情页应显示 \"2026-10-24 14:30\"。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要改 formatDate 本身（改了会连带破坏财务对账 CSV）"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要改 formatDate 本身（改了会连带破坏财务对账 CSV）。新增一个显示用的日本时间函数，只让订单详情页用它"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答没有按时间顺序叙述自己做过的步骤，只有结论、代码和验收。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "需要你拍板的一件事：其余 12 处调用是否也要改成日本时间？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "默认答案：只改订单详情页，其余先不动，等你确认后再逐个切换。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答没有开场客套、结尾客套或重复道歉，结尾是“如果要修我另提一个修改。”"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个显示用的日本时间函数，只让订单详情页用它"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现、没有改：formatPrice 用 yen * 1.1"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其余 12 处调用是否也要改成日本时间？……formatPrice 用 yen * 1.1，会出现 ¥1100.0000000000002 这类浮点结果，且没有取整。"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "输入 \"2026-10-24T05:30:00Z\"，订单详情页应显示 \"2026-10-24 14:30\"。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要改 formatDate 本身（改了会连带破坏财务对账 CSV）"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要改 formatDate 本身（改了会连带破坏财务对账 CSV）。新增一个显示用的日本时间函数，只让订单详情页用它"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答没有按时间顺序叙述自己做过的步骤，只有结论、代码和验收。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "需要你拍板的一件事：其余 12 处调用是否也要改成日本时间？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "默认答案：只改订单详情页，其余先不动，等你确认后再逐个切换。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答没有开场客套、结尾客套或重复道歉，结尾是“如果要修我另提一个修改。”"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个显示用的日本时间函数，只让订单详情页用它"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现、没有改：formatPrice 用 yen * 1.1"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其他 12 处我没看到，它们是否也该显示日本时间需要你确认……formatPrice 用 yen * 1.1，会出现 ¥1100.0000000000002 这类浮点结果，且没有取整"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "输入 \"2026-10-24T05:30:00Z\"，订单详情页应显示 \"2026-10-24 14:30\"。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要改 formatDate 本身（改了会连带破坏财务对账 CSV）……原 formatDate 不动（UTC，财务对账用）"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要改 formatDate 本身（改了会连带破坏财务对账 CSV）。新增一个显示用的日本时间函数，只让订单详情页用它"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "没有按时间顺序叙述做过的步骤；只有“以下代码我没有运行”的说明。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "其余 12 处调用是否也要改成日本时间？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "默认答案：只改订单详情页，其余先不动，等你确认后再逐个切换。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答以“结论：”开头，结尾是“如果要修我另提一个修改。”，没有开场或结尾客套，也没有道歉。"
+        }
+      ]
+    }
+  ]
+}

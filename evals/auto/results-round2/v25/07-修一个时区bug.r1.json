@@ -1,0 +1,120 @@
+{
+  "variant": "v25",
+  "scenario": "07-修一个时区bug",
+  "run": 1,
+  "answer": "结论：不要改 formatDate（财务 CSV 要保持 UTC，改了会直接变）。新增一个日本时间版本，只让订单详情页用它。\n\n未验证：我没法运行代码；另外 13 处调用里哪些该显示日本时间，我看不到，所以只改了订单详情页这一处。\n\n```js\n// utils/date.js —— formatDate 原样不动\n\nconst pad = (n) => String(n).padStart(2, '0');\n\n// 日本时间 (Asia/Tokyo)，格式与 formatDate 相同\nexport function formatDateJST(d) {\n  const x = new Date(new Date(d).getTime() + 9 * 60 * 60 * 1000);\n  return `${x.getUTCFullYear()}-${pad(x.getUTCMonth() + 1)}-${pad(x.getUTCDate())} ${pad(x.getUTCHours())}:${pad(x.getUTCMinutes())}`;\n}\n```\n\n```jsx\n// OrderDetail.jsx\n<span>{formatDateJST(order.created_at)}</span>\n```\n\n日本没有夏令时，固定加 9 小时是对的，且不依赖用户浏览器的时区。\n\n验证：输入 \"2026-10-24T05:30:00Z\"，应显示 \"2026-10-24 14:30\"。formatDate 对同一输入仍是 \"2026-10-24 05:30\"，CSV 不受影响。\n\n另外 13 处调用：请你扫一遍，凡是直接给用户看的页面（订单列表、通知等）大概率也有同样的问题，要不要改成 formatDateJST 由你定；CSV 那处一定不要动。\n\n顺带发现但没动：formatPrice 用 yen * 1.1，会出现小数（如 ¥1100.0000000000002 或 ¥109.9）。日元一般要取整，需要的话你说一声我再给修法。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个日本时间版本，只让订单详情页用它。……<span>{formatDateJST(order.created_at)}</span>"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现但没动：formatPrice 用 yen * 1.1"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "要不要改成 formatDateJST 由你定……顺带发现但没动：formatPrice 用 yen * 1.1，会出现小数"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "验证：输入 \"2026-10-24T05:30:00Z\"，应显示 \"2026-10-24 14:30\"。formatDate 对同一输入仍是 \"2026-10-24 05:30\"，CSV 不受影响。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要改 formatDate（财务 CSV 要保持 UTC，改了会直接变）"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要改 formatDate（财务 CSV 要保持 UTC，改了会直接变）。新增一个日本时间版本，只让订单详情页用它。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答中没有按时间顺序叙述做过的步骤，只有结论、代码和验证说明。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提出需要回答的问题。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "只改订单详情页一处，其余 13 处由用户决定，并给出倾向：凡是直接给用户看的页面大概率也有同样的问题。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答以“结论：”开头，结尾是 formatPrice 的说明，没有开场或结尾客套，也没有道歉。"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个日本时间版本，只让订单详情页用它。……<span>{formatDateJST(order.created_at)}</span>"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现但没动：formatPrice 用 yen * 1.1"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "要不要改成 formatDateJST 由你定……顺带发现但没动：formatPrice 用 yen * 1.1，会出现小数"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "验证：输入 \"2026-10-24T05:30:00Z\"，应显示 \"2026-10-24 14:30\"。formatDate 对同一输入仍是 \"2026-10-24 05:30\"，CSV 不受影响。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要改 formatDate（财务 CSV 要保持 UTC，改了会直接变）"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要改 formatDate（财务 CSV 要保持 UTC，改了会直接变）。新增一个日本时间版本，只让订单详情页用它。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答中没有按时间顺序叙述做过的步骤，只有结论、代码和验证说明。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提出需要回答的问题。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "只改订单详情页一处，其余 13 处由用户决定，并给出倾向：凡是直接给用户看的页面大概率也有同样的问题。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答以“结论：”开头，结尾是 formatPrice 的说明，没有开场或结尾客套，也没有道歉。"
+        }
+      ]
+    }
+  ]
+}

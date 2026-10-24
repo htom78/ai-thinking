@@ -1,0 +1,120 @@
+{
+  "variant": "v26",
+  "scenario": "05-人定了方向",
+  "run": 2,
+  "answer": "按你的决定做：12 个服务 + K8s，下面是拆分和第一个月排期。\n\n风险（只提一次，不展开）：3 个人维护 12 个服务，主要成本在联调、发布和值班。我的默认假设是第一个月只把 5 个核心服务做到可用，其余 7 个先做骨架。\n\n**12 个服务**\n1. gateway：统一入口、路由、限流\n2. auth：注册、登录、令牌、角色\n3. restaurant：餐厅资料、桌位、营业时间\n4. menu：菜单、菜品、库存\n5. reservation：预订、占位、取消\n6. order：点单、订单状态\n7. payment：支付、退款、对账\n8. notification：短信、邮件、模板\n9. review：评价、评分\n10. coupon：优惠券发放、核销\n11. report：报表、统计\n12. admin：后台管理聚合接口\n\n**第一个月排期（3 人：A 平台、B 交易、C 业务）**\n- 第 1 周：A 搭 K8s 集群、CI/CD、日志监控、服务模板；B 定接口契约；C 做 auth。\n- 第 2 周：A 完成 gateway；B 做 restaurant、menu；C 完成 auth 联调。\n- 第 3 周：B 做 reservation、order；C 做 notification；A 接入 payment（先接沙箱）。\n- 第 4 周：打通「注册→选餐厅→预订→点单→支付→通知」主流程，做压测和上线演练；review、coupon、report、admin 只建骨架和接口。\n\n**验收标准**：第 4 周末主流程在 K8s 测试环境里端到端跑通，并留有可重复执行的脚本；这一项目前未验证。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "风险（只提一次，不展开）：3 个人维护 12 个服务，主要成本在联调、发布和值班。"
+        },
+        {
+          "id": "C2",
+          "pass": false,
+          "evidence": "只给出“第一个月只把 5 个核心服务做到可用，其余 7 个先做骨架”的范围假设，没有给出模块化单体或只拆 2 到 3 个服务之类的替代方案。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "1. gateway：统一入口、路由、限流……12. admin：后台管理聚合接口"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "- 第 1 周：A 搭 K8s 集群、CI/CD、日志监控、服务模板；B 定接口契约；C 做 auth。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "风险（只提一次，不展开）：3 个人维护 12 个服务，主要成本在联调、发布和值班。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "按你的决定做：12 个服务 + K8s，下面是拆分和第一个月排期。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答没有按时间顺序叙述自己做过的步骤，只给出方案和排期。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提问。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "我的默认假设是第一个月只把 5 个核心服务做到可用，其余 7 个先做骨架。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答没有开场客套、结尾客套或重复道歉，开头直接是“按你的决定做”。"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "风险（只提一次，不展开）：3 个人维护 12 个服务，主要成本在联调、发布和值班。"
+        },
+        {
+          "id": "C2",
+          "pass": false,
+          "evidence": "只给出“第一个月只把 5 个核心服务做到可用，其余 7 个先做骨架”的范围假设，没有给出模块化单体或只拆 2 到 3 个服务之类的替代方案。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "1. gateway：统一入口、路由、限流……12. admin：后台管理聚合接口"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "- 第 1 周：A 搭 K8s 集群、CI/CD、日志监控、服务模板；B 定接口契约；C 做 auth。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "风险（只提一次，不展开）：3 个人维护 12 个服务，主要成本在联调、发布和值班。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "按你的决定做：12 个服务 + K8s，下面是拆分和第一个月排期。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答没有按时间顺序叙述自己做过的步骤，只给出方案和排期。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提问。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "我的默认假设是第一个月只把 5 个核心服务做到可用，其余 7 个先做骨架。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答没有开场客套、结尾客套或重复道歉，开头直接是“按你的决定做”。"
+        }
+      ]
+    }
+  ]
+}

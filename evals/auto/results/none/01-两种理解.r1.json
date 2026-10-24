@@ -1,0 +1,69 @@
+{
+  "variant": "none",
+  "scenario": "01-两种理解",
+  "run": 1,
+  "answer": "我看不到你的 Excel，也没法联系你确认，所以下面这份是按“你不用再回我”设计的。先说我的判断和假设，再给可直接跑的脚本和周一汇报的模板。\n\n【先定调：老板要的不是“分析”，是决策】\n老板周一 9 点看，他真正想知道的大概是三件事：\n1. 客户在抱怨/问什么？哪几类最多、最严重？\n2. 最近有没有变坏的趋势或突发问题？\n3. 我们该先做什么？\n所以交付物应该是一页结论加几张图，不是 2 万行明细。\n\n【我的默认假设（你周一前一眼能确认，错了就改一处）】\n- “分析”= 主题分类 + 情绪倾向 + 时间趋势 + 渠道对比 + 典型原话 + 行动建议。\n- 留言是中文，一条一行，一个客户可能留多条。\n- 数据可能有脏数据：空留言、重复、测试留言、客户ID 缺失。脚本里已经处理。\n\n【第 1 步：5 分钟，先摸底（脚本 A）】\n```python\nimport pandas as pd\ndf = pd.read_excel(\"留言.xlsx\")          # 改成你的文件名\ndf.columns = [\"日期\",\"客户ID\",\"留言内容\",\"渠道\"]\ndf[\"日期\"] = pd.to_datetime(df[\"日期\"], errors=\"coerce\")\ndf[\"留言内容\"] = df[\"留言内容\"].astype(str).str.strip()\n\nprint(len(df), \"条；日期范围\", df[\"日期\"].min(), \"~\", df[\"日期\"].max())\nprint(\"空留言\", (df[\"留言内容\"].isin([\"\",\"nan\"])).sum())\nprint(\"完全重复\", df.duplicated([\"客户ID\",\"留言内容\"]).sum())\nprint(df[\"渠道\"].value_counts())\nprint(\"独立客户数\", df[\"客户ID\"].nunique())\nprint(df[\"留言内容\"].str.len().describe())\ndf = df[~df[\"留言内容\"].isin([\"\",\"nan\"])].drop_duplicates([\"客户ID\",\"留言内容\"])\ndf.to_pickle(\"clean.pkl\")\n```\n这一步的输出直接作为汇报第一页的“数据概况”。\n\n【第 2 步：主题分类（脚本 B，不依赖任何 API，周末一个人能跑完）】\n2 万条用“关键词规则 + 聚类找漏网”最稳，不需要大模型也能出结果：\n```python\nimport pandas as pd, jieba, re\nfrom sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.cluster import KMeans\n\ndf = pd.read_pickle(\"clean.pkl\")\n\n# 1) 先用关键词规则打标签；词表你可以按业务补充\nrules = {\n \"物流/配送\": [\"物流\",\"快递\",\"发货\",\"配送\",\"没收到\",\"延迟\",\"送达\"],\n \"质量/故障\": [\"坏了\",\"质量\",\"故障\",\"打不开\",\"闪退\",\"bug\",\"卡顿\",\"报错\"],\n \"价格/退款\": [\"退款\",\"退钱\",\"价格\",\"贵\",\"优惠\",\"发票\",\"扣款\",\"多收\"],\n \"服务态度\":  [\"客服\",\"态度\",\"不理\",\"投诉\",\"敷衍\",\"没人回\"],\n \"使用咨询\":  [\"怎么\",\"如何\",\"能不能\",\"可以吗\",\"请问\",\"咨询\"],\n \"表扬/感谢\": [\"谢谢\",\"满意\",\"很好\",\"好评\",\"不错\",\"点赞\"],\n}\ndef tag(t):\n    hit = [k for k,ws in rules.items() if any(w in t for w in ws)]\n    return hit or [\"未归类\"]\ndf[\"主题\"] = df[\"留言内容\"].apply(tag)\nd = df.explode(\"主题\")\nprint(d[\"主题\"].value_counts(normalize=True).round(3))\n\n# 2) 对“未归类”做聚类，看看漏了什么新主题\nun = df[df[\"主题\"].apply(lambda x: x==[\"未归类\"])]\nseg = un[\"留言内容\"].apply(lambda s: \" \".join(jieba.cut(s)))\nX = TfidfVectorizer(max_features=3000, min_df=3).fit_transform(seg)\nk = min(12, max(3, len(un)//200))\nun = un.assign(簇=KMeans(k, n_init=10, random_state=0).fit_predict(X))\nfor c,g in un.groupby(\"簇\"):\n    print(\"\\n簇\",c,len(g),\"条，样例：\")\n    print(g[\"留言内容\"].sample(min(5,len(g)), random_state=0).tolist())\n```\n跑完看“未归类”占比：\n- 低于 20%：规则够用，直接用。\n- 高于 30%：看聚类样例，把新主题的关键词补进 rules 再跑一遍。这一步是你唯一必须人工看一眼的地方，大约 15 分钟。\n\n【第 3 步：情绪与严重度（极简版）】\n```python\nneg = [\"投诉\",\"退款\",\"骗\",\"垃圾\",\"太差\",\"失望\",\"再也不\",\"举报\",\"气死\",\"差评\",\"欺骗\",\"维权\",\"315\"]\npos = [\"谢谢\",\"满意\",\"很好\",\"好评\",\"不错\",\"点赞\"]\ndf[\"负面\"] = df[\"留言内容\"].apply(lambda s: any(w in s for w in neg))\ndf[\"正面\"] = df[\"留言内容\"].apply(lambda s: any(w in s for w in pos))\ndf[\"高危\"] = df[\"留言内容\"].str.contains(\"投诉|举报|维权|315|媒体|律师|起诉\")\ndf[\"月\"] = df[\"日期\"].dt.to_period(\"M\")\nprint(df.groupby(\"月\")[[\"负面\",\"高危\"]].mean().round(3))\nprint(df.groupby(\"渠道\")[[\"负面\",\"高危\"]].mean().round(3))\nprint(df.groupby(df[\"日期\"].dt.to_period(\"W\")).size().tail(12))   # 近 12 周量\n```\n关键词情绪粗糙，汇报里要写清楚“这是关键词口径，不是模型精判”。\n\n【第 4 步：出图和数字（脚本 C）】\n至少出这 5 样：\n1. 主题占比条形图（按数量排序）。\n2. 月度/周度留言量趋势，并按“负面占比”画第二条线。\n3. 渠道 × 主题热力表。\n4. 高危留言清单：导出 Excel，包含日期、客户ID、原文，按日期倒序。老板最关心的是这些，也是有人要当天跟进的。\n5. 同一客户反复留言（≥3 条）的名单，这些人往往是最没被解决的。\n```python\nimport matplotlib.pyplot as plt\nplt.rcParams[\"font.sans-serif\"]=[\"PingFang SC\",\"SimHei\",\"Microsoft YaHei\"]\nd[\"主题\"].value_counts().plot.barh(); plt.tight_layout(); plt.savefig(\"主题.png\",dpi=150)\ndf.groupby(\"月\").size().plot(marker=\"o\"); plt.savefig(\"趋势.png\",dpi=150)\npd.crosstab(d[\"渠道\"], d[\"主题\"]).to_excel(\"渠道x主题.xlsx\")\ndf[df[\"高危\"]].sort_values(\"日期\",ascending=False).to_excel(\"高危留言.xlsx\",index=False)\nrep = df.groupby(\"客户ID\").size(); df[df[\"客户ID\"].isin(rep[rep>=3].index)].to_excel(\"反复留言客户.xlsx\",index=False)\n```\n\n【第 5 步：周一早上的一页纸（把数字填进去就行）】\n标题：客户留言分析（日期范围，共 N 条，M 位客户）\n1. 一句话结论：“留言主要集中在 ___（占 __%）和 ___（占 __%）；近 N 周 ___ 类上升 __%；___ 渠道负面占比最高（__%）。”\n2. 三个最重要发现（每个带一个数字、一条典型原话）。\n3. 风险：高危留言 X 条，其中近 30 天 Y 条，已导出清单，建议周一当天指派跟进。\n4. 建议动作（最多 3 条，每条写负责人建议和预期效果）：\n   - 针对最大主题的处理办法；\n   - 针对上升/突发问题的排查；\n   - 针对反复留言客户的专项回访。\n5. 口径与局限（必须写，防止老板追问时被问住）：规则分类与关键词情绪，抽样检查准确率约 __%；未归类 __%；留言不代表全体客户。\n\n【建议你在周一前做的 3 个核对（共约 30 分钟）】\n- 随机抽 50 条已分类的留言，人工看分类对不对，算准确率，写进“局限”里。\n- 看一下高危清单前 20 条，确认不是误报（比如“不投诉，谢谢”）。\n- 趋势图如果出现某天暴增，先查是不是批量导入/测试数据造成的，再下结论。\n\n【如果你周末有 AI 额度、想做得更好】\n把“未归类”和“高危”的留言（通常几千条以内）分批交给大模型做精细分类和一句话摘要，其余用规则；并让它输出固定 JSON（主题、情绪、严重度、是否需要跟进）。这样成本小、准确率更高，但不是必须的。上面的规则版已经够周一汇报。\n\n【我不确定、需要你周一前自己判断的地方】\n- 老板的真实关注点（投诉？产品改进？客服质量？）。如果你能在周一前问一句，就把第 5 步的结论顺序按他关心的排。\n- 留言里是否含个人隐私（手机号、地址）。给老板的文件里请先脱敏或只展示客户ID。\n\n最省事的路径：跑脚本 A→B→C，补一次词表，填一页纸，核对 3 项。留言内容有了真实分布后，结论部分一句话就能写出来。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "老板周一 9 点看，他真正想知道的大概是三件事：……所以交付物应该是一页结论加几张图，不是 2 万行明细。"
+        },
+        {
+          "id": "C2",
+          "pass": false,
+          "evidence": "只列出“分析”= 主题分类 + 情绪倾向 + 时间趋势 + 渠道对比 + 典型原话 + 行动建议，是方法清单，没有说明不同理解会让产出有何差异，也没有在几种理解中选定一种。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "我的默认假设（你周一前一眼能确认，错了就改一处）"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "随机抽 50 条已分类的留言，人工看分类对不对，算准确率，写进“局限”里。"
+        },
+        {
+          "id": "C5",
+          "pass": false,
+          "evidence": "脚本 A 直接读取并处理整个 Excel（df = pd.read_excel(\"留言.xlsx\")），没有先取几百条小样本试跑再放大到全量。"
+        },
+        {
+          "id": "C6",
+          "pass": true,
+          "evidence": "【我的默认假设（你周一前一眼能确认，错了就改一处）】……【我不确定、需要你周一前自己判断的地方】"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": false,
+          "evidence": "前两句是在说明自己看不到 Excel、无法联系用户，以及后文的安排，没有先给判断、推荐或结果。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "最省事的路径：跑脚本 A→B→C，补一次词表，填一页纸，核对 3 项。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "我的默认假设（你周一前一眼能确认，错了就改一处）"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "上面的规则版已经够周一汇报。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "我看不到你的 Excel，也没法联系你确认，所以下面这份是按“你不用再回我”设计的。"
+        }
+      ]
+    }
+  ]
+}

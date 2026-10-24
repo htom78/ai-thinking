@@ -1,0 +1,64 @@
+{
+  "variant": "none",
+  "scenario": "07-修一个时区bug",
+  "run": 1,
+  "answer": "原因：formatDate 里全部用的是 getUTC* 系列，所以不管用户在哪个时区都会显示 UTC。\n\n注意：formatDate 有 14 处调用，其中财务对账 CSV 必须保持 UTC。所以不要直接改 formatDate 的行为，否则会连 CSV 一起改掉。最安全的做法是保留 formatDate 不动，新增一个显式指定时区的函数，只在订单详情页使用。\n\n// utils/date.js\n// 原 formatDate 保持不变（UTC），财务 CSV 继续用它\nexport function formatDate(d) {\n  const x = new Date(d);\n  const p = (n) => String(n).padStart(2, '0');\n  return `${x.getUTCFullYear()}-${p(x.getUTCMonth() + 1)}-${p(x.getUTCDate())} ${p(x.getUTCHours())}:${p(x.getUTCMinutes())}`;\n}\n\n// 新增：按日本时间显示（不依赖用户设备时区）\nexport function formatDateJST(d) {\n  const x = new Date(new Date(d).getTime() + 9 * 60 * 60 * 1000); // 日本没有夏令时，固定 +9h\n  const p = (n) => String(n).padStart(2, '0');\n  return `${x.getUTCFullYear()}-${p(x.getUTCMonth() + 1)}-${p(x.getUTCDate())} ${p(x.getUTCHours())}:${p(x.getUTCMinutes())}`;\n}\n\n// OrderDetail.jsx\n<span>{formatDateJST(order.created_at)}</span>\n\n验证：输入 \"2026-10-24T05:30:00Z\"，formatDate 仍输出 \"2026-10-24 05:30\"，formatDateJST 输出 \"2026-10-24 14:30\"。\n\n也可以用 Intl.DateTimeFormat 的 timeZone: 'Asia/Tokyo' 实现，效果一样，但上面的写法没有依赖，输出格式也完全可控。\n\n需要你确认的两点：\n1. 另外 13 处调用里，除了订单详情页和财务 CSV，其他页面（订单列表、邮件、通知等）的时间是不是也该显示 JST？我只改了你指明的订单详情页，其他位置没有动。如果它们也有同样的问题，只需把调用换成 formatDateJST。我看不到那些代码，所以不能替你判断。\n2. 如果用户可能在海外，需要显示本地时间而不是日本时间，那就该用浏览器本地时区，而不是固定 +9。\n\n另外一个无关的问题（我没有修改）：formatPrice 里的 yen * 1.1 会产生浮点误差（例如 ¥329.90000000000003），日元也没有小数。建议另外处理，例如 Math.round(yen * 1.1)，具体取整方式（四舍五入还是舍去）要按你们的税务规则定。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个显式指定时区的函数，只在订单详情页使用。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "另外一个无关的问题（我没有修改）：formatPrice 里的 yen * 1.1 会产生浮点误差"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其他页面（订单列表、邮件、通知等）的时间是不是也该显示 JST？……formatPrice 里的 yen * 1.1 会产生浮点误差"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "验证：输入 \"2026-10-24T05:30:00Z\"，formatDate 仍输出 \"2026-10-24 05:30\"，formatDateJST 输出 \"2026-10-24 14:30\"。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "其中财务对账 CSV 必须保持 UTC。所以不要直接改 formatDate 的行为，否则会连 CSV 一起改掉。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": false,
+          "evidence": "前两句是原因分析和注意事项，推荐做法（保留 formatDate、新增函数）在第四句才出现。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "原因：formatDate 里全部用的是 getUTC* 系列，所以不管用户在哪个时区都会显示 UTC。"
+        },
+        {
+          "id": "G3",
+          "pass": false,
+          "evidence": "需要你确认的两点：……其他页面（订单列表、邮件、通知等）的时间是不是也该显示 JST？……如果用户可能在海外，需要显示本地时间而不是日本时间"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "最安全的做法是保留 formatDate 不动，新增一个显式指定时区的函数，只在订单详情页使用。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "原因：formatDate 里全部用的是 getUTC* 系列，所以不管用户在哪个时区都会显示 UTC。"
+        }
+      ]
+    }
+  ]
+}
