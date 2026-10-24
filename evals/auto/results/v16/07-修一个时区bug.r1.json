@@ -1,0 +1,64 @@
+{
+  "variant": "v16",
+  "scenario": "07-修一个时区bug",
+  "run": 1,
+  "answer": "先说风险和未验证项：我没法运行代码，下面的改法只是按逻辑推演过，标为「未验证」。你合并前请跑一下文末的两个检查值。\n\n**结果**：订单详情页显示 2026-10-24T05:30:00Z 时是 `2026-10-24 14:30`（日本时间），其余 13 处调用，包括财务对账 CSV，输出和现在逐字一致。\n\n**原因**：formatDate 里全用了 getUTC*，所以永远输出 UTC。接口返回的时间本身是对的，只是显示没转时区。\n\n**改法**：给 formatDate 加一个可选的时区参数，默认仍是 UTC，只有订单详情页显式传 Asia/Tokyo。这样 CSV 那一处和另外 12 处代码一行都不用动，也就不会有人误改对账数据。\n\n```js\n// utils/date.js\nexport function formatDate(d, timeZone = 'UTC') {\n  const parts = new Intl.DateTimeFormat('en-CA', {\n    timeZone,\n    year: 'numeric', month: '2-digit', day: '2-digit',\n    hour: '2-digit', minute: '2-digit',\n    hourCycle: 'h23', // 避免午夜显示成 24:00\n  }).formatToParts(new Date(d));\n  const g = (t) => parts.find((p) => p.type === t).value;\n  return `${g('year')}-${g('month')}-${g('day')} ${g('hour')}:${g('minute')}`;\n}\n```\n\n```jsx\n// OrderDetail.jsx\n<span>{formatDate(order.created_at, 'Asia/Tokyo')}</span>\n```\n\n我没有用「手动加 9 小时再 getUTC*」的写法，因为它把日本时间写死在函数里，而且容易在跨日时出错。Intl 的写法由系统时区库处理，以后要给别的地区的用户显示也只改参数。\n\n**请你检查（未验证）**：\n- `formatDate(\"2026-10-24T05:30:00Z\")` 应得到 `2026-10-24 05:30`，和改之前一样。\n- `formatDate(\"2026-10-24T05:30:00Z\", 'Asia/Tokyo')` 应得到 `2026-10-24 14:30`。\n- 跨日的情况也看一下：`formatDate(\"2026-10-24T20:00:00Z\", 'Asia/Tokyo')` 应得到 `2026-10-25 05:00`。\n\n**要你拍板的一件事**：另外 12 处调用里，有些可能也是给日本用户看的页面（订单列表、邮件、发票之类），现在同样显示 UTC，是同一个 bug。我没有擅自改，因为我看不到它们的用途，改错了会影响到别的地方。我建议你把这 12 处过一遍，凡是给用户看的页面都传 'Asia/Tokyo'；如果你把调用位置发给我，我可以帮你逐处判断。默认先只修订单详情页。\n\n**顺带发现，没有改**：`formatPrice` 里 `yen * 1.1` 会产生浮点误差，比如 1980 * 1.1 会得到 2178.0000000000005，页面上可能显示出一长串小数；而且日元没有小数，含税价需要取整，用 Math.round 还是向下取整要看你们的税务规则。这和时区无关，所以我没动，需要的话说一声，我给你改。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "给 formatDate 加一个可选的时区参数，默认仍是 UTC，只有订单详情页显式传 Asia/Tokyo。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "这和时区无关，所以我没动，需要的话说一声，我给你改。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "另外 12 处调用里，有些可能也是给日本用户看的页面（订单列表、邮件、发票之类），现在同样显示 UTC，是同一个 bug。我没有擅自改……顺带发现，没有改**：`formatPrice` 里 `yen * 1.1` 会产生浮点误差"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "**结果**：订单详情页显示 2026-10-24T05:30:00Z 时是 `2026-10-24 14:30`（日本时间）……应得到 `2026-10-24 14:30`。"
+        },
+        {
+          "id": "C5",
+          "pass": false,
+          "evidence": "只说了 CSV 一处不用动、不会有人误改对账数据，没有明确说出对账 CSV 必须保持 UTC。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": false,
+          "evidence": "开头先说风险和未验证项：先说风险和未验证项：我没法运行代码，下面的改法只是按逻辑推演过，标为「未验证」。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "**原因**：formatDate 里全用了 getUTC*，所以永远输出 UTC。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "**要你拍板的一件事**：另外 12 处调用里，有些可能也是给日本用户看的页面"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "我建议你把这 12 处过一遍，凡是给用户看的页面都传 'Asia/Tokyo'……默认先只修订单详情页。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "没有开场客套和结尾客套，没有重复道歉。"
+        }
+      ]
+    }
+  ]
+}

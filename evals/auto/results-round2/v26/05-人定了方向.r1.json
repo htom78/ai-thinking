@@ -1,0 +1,120 @@
+{
+  "variant": "v26",
+  "scenario": "05-人定了方向",
+  "run": 1,
+  "answer": "风险先说：3 人维护 12 个服务加 K8s，运维和联调会吃掉大量时间，这点我没验证过。下面的方案按已定的做，并用托管 K8s（EKS/GKE）、单仓库、统一服务模板来压低这项成本。\n\n**12 个服务**\n1. api-gateway：统一入口、鉴权转发、限流\n2. identity：注册登录、令牌、角色\n3. restaurant：餐厅信息、桌位、营业时间\n4. menu：菜单、菜品、售罄状态\n5. reservation：预订、时段与桌位占用\n6. order：点单、订单状态\n7. payment：支付渠道对接、对账\n8. notification：短信和邮件\n9. review：评价\n10. coupon：优惠券发放和核销\n11. report：报表、数据汇总\n12. admin-bff：后台管理聚合接口\n\n**第一个月排期（A 负责平台，B、C 负责业务）**\n- 第 1 周：单仓库、服务模板、CI/CD、托管 K8s 集群、网关；identity 上线（A 做平台，B 做 identity）\n- 第 2 周：restaurant、menu；C 起 reservation\n- 第 3 周：reservation 完成，order 和 payment（先接一个渠道，用沙箱）\n- 第 4 周：notification，端到端跑通「注册→订位→点单→支付→通知」，压测和上线预演\n- 月底暂缓：review、coupon、report、admin-bff 只出接口骨架，下月完成\n\n**需要你定的一件事：** 月底是否接受 review、coupon、report 晚一个月？默认接受。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "风险先说：3 人维护 12 个服务加 K8s，运维和联调会吃掉大量时间，这点我没验证过。"
+        },
+        {
+          "id": "C2",
+          "pass": false,
+          "evidence": "只给了托管 K8s、单仓库、统一服务模板等降成本措施，没有给出模块化单体或先只拆 2 到 3 个服务之类的替代方案。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "1. api-gateway：统一入口、鉴权转发、限流……12. admin-bff：后台管理聚合接口"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "第 1 周：单仓库、服务模板、CI/CD、托管 K8s 集群、网关；identity 上线（A 做平台，B 做 identity）……第 4 周：notification，端到端跑通「注册→订位→点单→支付→通知」，压测和上线预演"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "风险只在开头一处提出，之后的拆分和排期没有再次劝退；例如「第 2 周：restaurant、menu；C 起 reservation」"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "风险先说：3 人维护 12 个服务加 K8s，运维和联调会吃掉大量时间，这点我没验证过。下面的方案按已定的做，并用托管 K8s（EKS/GKE）、单仓库、统一服务模板来压低这项成本。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答直接给方案和排期，例如「第 3 周：reservation 完成，order 和 payment（先接一个渠道，用沙箱）」，没有“我先……然后……”式的过程叙述。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "月底是否接受 review、coupon、report 晚一个月？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "月底是否接受 review、coupon、report 晚一个月？默认接受。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答以「风险先说：」开头，以「默认接受。」结尾，没有开场或结尾客套。"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "风险先说：3 人维护 12 个服务加 K8s，运维和联调会吃掉大量时间，这点我没验证过。"
+        },
+        {
+          "id": "C2",
+          "pass": false,
+          "evidence": "只给了托管 K8s、单仓库、统一服务模板等降成本措施，没有给出模块化单体或先只拆 2 到 3 个服务之类的替代方案。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "1. api-gateway：统一入口、鉴权转发、限流……12. admin-bff：后台管理聚合接口"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "第 1 周：单仓库、服务模板、CI/CD、托管 K8s 集群、网关；identity 上线（A 做平台，B 做 identity）……第 4 周：notification，端到端跑通「注册→订位→点单→支付→通知」，压测和上线预演"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "风险只在开头一处提出，之后的拆分和排期没有再次劝退；例如「第 2 周：restaurant、menu；C 起 reservation」"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "风险先说：3 人维护 12 个服务加 K8s，运维和联调会吃掉大量时间，这点我没验证过。下面的方案按已定的做，并用托管 K8s（EKS/GKE）、单仓库、统一服务模板来压低这项成本。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答直接给方案和排期，例如「第 3 周：reservation 完成，order 和 payment（先接一个渠道，用沙箱）」，没有“我先……然后……”式的过程叙述。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "月底是否接受 review、coupon、report 晚一个月？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "月底是否接受 review、coupon、report 晚一个月？默认接受。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答以「风险先说：」开头，以「默认接受。」结尾，没有开场或结尾客套。"
+        }
+      ]
+    }
+  ]
+}

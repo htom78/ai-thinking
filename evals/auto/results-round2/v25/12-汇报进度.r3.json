@@ -1,0 +1,120 @@
+{
+  "variant": "v25",
+  "scenario": "12-汇报进度",
+  "run": 3,
+  "answer": "没迁完，周一 09:00 切换有风险，卡在一件需要你拍板的事上。\n\n要你定：payments 表里约 3200 行（共 41 万行）currency 是 NULL，违反新库 NOT NULL 约束。这些行怎么处理？\n- A. 填 JPY（如果你确认这些是日元订单）\n- B. 当历史脏数据，单独导出给你核对，不进新库\n我的建议：先选 B 导出这 3200 行，让你或财务看一眼，其余 41 万行先迁。你回 A 或 B 就行，我没改约束、也没填默认值。\n\n没验证的：\n- 应用层集成测试一次没跑\n- 新库索引还没建\n\n进度：12 张表迁完 8 张，行数核对一致。剩 payments、refunds、invoices，后两张依赖 payments。你拍板后我估计还要约 3 小时，现在周六 18:00，时间够，但集成测试和索引要在这之后做，周一前仍有余量。\n\n你回我 A 或 B，我就继续。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "没迁完，周一 09:00 切换有风险，卡在一件需要你拍板的事上。……payments 表里约 3200 行（共 41 万行）currency 是 NULL"
+        },
+        {
+          "id": "C2",
+          "pass": false,
+          "evidence": "没有明确表示收到，也没有给出用户需要决定的最迟时间。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "进度：12 张表迁完 8 张，行数核对一致。"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "没验证的：……应用层集成测试一次没跑……新库索引还没建"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "剩 payments、refunds、invoices……你拍板后我估计还要约 3 小时……我的建议：先选 B 导出这 3200 行"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "没迁完，周一 09:00 切换有风险，卡在一件需要你拍板的事上。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "进度：12 张表迁完 8 张，行数核对一致。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "这些行怎么处理？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "我的建议：先选 B 导出这 3200 行"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "没迁完，周一 09:00 切换有风险"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "没迁完，周一 09:00 切换有风险，卡在一件需要你拍板的事上。……payments 表里约 3200 行（共 41 万行）currency 是 NULL"
+        },
+        {
+          "id": "C2",
+          "pass": false,
+          "evidence": "没有明确表示收到，也没有给出用户需要决定的最迟时间。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "进度：12 张表迁完 8 张，行数核对一致。"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "没验证的：……应用层集成测试一次没跑……新库索引还没建"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "剩 payments、refunds、invoices……你拍板后我估计还要约 3 小时……我的建议：先选 B 导出这 3200 行"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "没迁完，周一 09:00 切换有风险，卡在一件需要你拍板的事上。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "进度：12 张表迁完 8 张，行数核对一致。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "这些行怎么处理？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "我的建议：先选 B 导出这 3200 行"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "没迁完，周一 09:00 切换有风险"
+        }
+      ]
+    }
+  ]
+}

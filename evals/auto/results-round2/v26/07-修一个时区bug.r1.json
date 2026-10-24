@@ -1,0 +1,120 @@
+{
+  "variant": "v26",
+  "scenario": "07-修一个时区bug",
+  "run": 1,
+  "answer": "结论：不要改 formatDate（它有 14 处调用，含必须保持 UTC 的财务 CSV）。新增一个固定东京时区的函数，只在订单详情页换用。\n\n```js\n// utils/date.js（formatDate 原样不动，新增）\nexport function formatDateJST(d) {\n  const parts = new Intl.DateTimeFormat('sv-SE', {\n    timeZone: 'Asia/Tokyo',\n    year: 'numeric', month: '2-digit', day: '2-digit',\n    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',\n  }).format(new Date(d));\n  return parts; // \"2026-10-24 14:30\"\n}\n```\n\n```jsx\n// OrderDetail.jsx\n<span>{formatDateJST(order.created_at)}</span>\n```\n\n预期：`\"2026-10-24T05:30:00Z\"` 显示为 `2026-10-24 14:30`。\n未验证：我没有运行这段代码。请用这个输入跑一次，并确认 CSV 导出的输出没变。\nIntl 的 `sv-SE` 格式在现代浏览器和 Node 里输出 `YYYY-MM-DD HH:mm`，如果要支持很老的环境，请告诉我，我换成手动偏移 +9 小时的写法。\n\n需要你拍板：\n1. 另外 12 处 formatDate 调用，哪些也该显示日本时间（列表页、通知等）？我没动它们，请你确认一下。\n2. `formatPrice` 里 `yen * 1.1` 会出现浮点误差（例如 ¥330.00000000000006），而且小数没有取整。这不在本次范围内，我没改。建议另开一个 bug 处理。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个固定东京时区的函数，只在订单详情页换用。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "这不在本次范围内，我没改。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "另外 12 处 formatDate 调用，哪些也该显示日本时间（列表页、通知等）？我没动它们，请你确认一下。……`formatPrice` 里 `yen * 1.1` 会出现浮点误差"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "预期：`\"2026-10-24T05:30:00Z\"` 显示为 `2026-10-24 14:30`。……请用这个输入跑一次，并确认 CSV 导出的输出没变。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要改 formatDate（它有 14 处调用，含必须保持 UTC 的财务 CSV）。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要改 formatDate（它有 14 处调用，含必须保持 UTC 的财务 CSV）。新增一个固定东京时区的函数，只在订单详情页换用。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答没有按时间顺序叙述做过的步骤，只说明了未运行代码。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "只有一个真正需要回答的问题：另外 12 处 formatDate 调用，哪些也该显示日本时间（列表页、通知等）？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "建议另开一个 bug 处理。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答没有开场或结尾客套，直接以“结论：”开头，以建议结尾。"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个固定东京时区的函数，只在订单详情页换用。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "这不在本次范围内，我没改。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "另外 12 处 formatDate 调用，哪些也该显示日本时间（列表页、通知等）？我没动它们，请你确认一下。……`formatPrice` 里 `yen * 1.1` 会出现浮点误差"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "预期：`\"2026-10-24T05:30:00Z\"` 显示为 `2026-10-24 14:30`。……请用这个输入跑一次，并确认 CSV 导出的输出没变。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要改 formatDate（它有 14 处调用，含必须保持 UTC 的财务 CSV）。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要改 formatDate（它有 14 处调用，含必须保持 UTC 的财务 CSV）。新增一个固定东京时区的函数，只在订单详情页换用。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答没有按时间顺序叙述做过的步骤，只说明了未运行代码。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "只有一个真正需要回答的问题：另外 12 处 formatDate 调用，哪些也该显示日本时间（列表页、通知等）？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "建议另开一个 bug 处理。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答没有开场或结尾客套，直接以“结论：”开头，以建议结尾。"
+        }
+      ]
+    }
+  ]
+}

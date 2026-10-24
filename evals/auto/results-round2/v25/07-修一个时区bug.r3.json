@@ -1,0 +1,120 @@
+{
+  "variant": "v25",
+  "scenario": "07-修一个时区bug",
+  "run": 3,
+  "answer": "结论：不要改 formatDate（它被 14 处调用，其中财务 CSV 必须保持 UTC）。新增一个按日本时间显示的函数，只在订单详情页换用。\n\n```js\n// utils/date.js —— formatDate 和 formatPrice 原样不动，新增：\nexport function formatDateJST(d) {\n  const parts = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Asia/Tokyo',\n    year: 'numeric', month: '2-digit', day: '2-digit',\n    hour: '2-digit', minute: '2-digit', hour12: false,\n  }).formatToParts(new Date(d));\n  const g = (t) => parts.find((p) => p.type === t).value;\n  const h = g('hour') === '24' ? '00' : g('hour'); // 部分环境午夜会返回 24\n  return `${g('year')}-${g('month')}-${g('day')} ${h}:${g('minute')}`;\n}\n```\n\n```jsx\n// OrderDetail.jsx\n<span>{formatDateJST(order.created_at)}</span>\n```\n\n预期结果：\"2026-10-24T05:30:00Z\" 显示为 \"2026-10-24 14:30\"。财务 CSV 仍调用 formatDate，输出不变。\n\n未验证：我没有运行这段代码，上面的预期值是按时区换算推出来的。合并前请用这个样例跑一次，再加一个跨日用例（如 \"2026-10-24T16:00:00Z\" 应得到 \"2026-10-25 01:00\"）。\n\n另外两件事，我没有动，由你决定：\n1. 其余 12 处 formatDate 调用（除订单详情页和 CSV 外）如果也是面向用户展示，同样会差 9 小时，建议逐个确认后再换成 formatDateJST。\n2. formatPrice 里 `yen * 1.1` 会产生浮点误差（例如 ¥330.00000000000006），而且日元没有小数，应该取整，比如 `Math.round(yen * 1.1)`。这是另一个 bug，不在这次范围内。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个按日本时间显示的函数，只在订单详情页换用。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "formatDate 和 formatPrice 原样不动，新增："
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其余 12 处 formatDate 调用（除订单详情页和 CSV 外）如果也是面向用户展示，同样会差 9 小时……formatPrice 里 `yen * 1.1` 会产生浮点误差"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "预期结果：\"2026-10-24T05:30:00Z\" 显示为 \"2026-10-24 14:30\"。……合并前请用这个样例跑一次，再加一个跨日用例"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要改 formatDate（它被 14 处调用，其中财务 CSV 必须保持 UTC）。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要改 formatDate（它被 14 处调用，其中财务 CSV 必须保持 UTC）。新增一个按日本时间显示的函数，只在订单详情页换用。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答中没有按时间顺序叙述自己做过的步骤，只有“我没有运行这段代码”的说明。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提出需要回答的问题。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "建议逐个确认后再换成 formatDateJST。……应该取整，比如 `Math.round(yen * 1.1)`。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答没有开场客套、结尾客套或重复道歉，以“结论：”开头，以 formatPrice 的说明结尾。"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "新增一个按日本时间显示的函数，只在订单详情页换用。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "formatDate 和 formatPrice 原样不动，新增："
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其余 12 处 formatDate 调用（除订单详情页和 CSV 外）如果也是面向用户展示，同样会差 9 小时……formatPrice 里 `yen * 1.1` 会产生浮点误差"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "预期结果：\"2026-10-24T05:30:00Z\" 显示为 \"2026-10-24 14:30\"。……合并前请用这个样例跑一次，再加一个跨日用例"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要改 formatDate（它被 14 处调用，其中财务 CSV 必须保持 UTC）。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要改 formatDate（它被 14 处调用，其中财务 CSV 必须保持 UTC）。新增一个按日本时间显示的函数，只在订单详情页换用。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答中没有按时间顺序叙述自己做过的步骤，只有“我没有运行这段代码”的说明。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提出需要回答的问题。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "建议逐个确认后再换成 formatDateJST。……应该取整，比如 `Math.round(yen * 1.1)`。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答没有开场客套、结尾客套或重复道歉，以“结论：”开头，以 formatPrice 的说明结尾。"
+        }
+      ]
+    }
+  ]
+}

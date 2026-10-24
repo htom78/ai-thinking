@@ -1,0 +1,120 @@
+{
+  "variant": "v26",
+  "scenario": "05-人定了方向",
+  "run": 3,
+  "answer": "方案如下，按你的决定执行。\n风险（只说一次）：3 人维护 12 个服务，最大成本是运维和跨服务调试。对策已排进第 1 周：统一模板、统一日志和链路追踪。未验证：12 个服务一个月内是否都能上线，所以排期按\"先通主流程\"定。\n\n12 个服务：\n1. gateway：API 网关、鉴权转发\n2. user：注册登录、令牌\n3. restaurant：餐厅信息\n4. menu：菜单、库存\n5. reservation：预订、桌位\n6. order：点单、订单状态\n7. payment：支付、对账\n8. notification：短信和邮件\n9. review：评价\n10. coupon：优惠券\n11. report：报表（读副本，不碰主库）\n12. admin：后台管理（BFF，聚合调用其他服务）\n\n第一个月（3 人：A 基建，B 和 C 业务）：\n- 第 1 周：A 搭 K8s、CI/CD、日志和监控、服务模板；B、C 定接口契约（OpenAPI）和事件清单。\n- 第 2 周：gateway、user、restaurant、menu 上线，B 和 C 分头做。\n- 第 3 周：reservation、order、payment 打通主流程：登录、订座、点单、支付。\n- 第 4 周：notification、coupon、review 上线；report、admin 做最小版；全链路测试。\n\n默认假设：云上托管 K8s，消息队列用托管服务。你要换，告诉我，我只改受影响部分。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "风险（只说一次）：3 人维护 12 个服务，最大成本是运维和跨服务调试。"
+        },
+        {
+          "id": "C2",
+          "pass": false,
+          "evidence": "回答只提了风险和对策，没有给出模块化单体或先只拆 2 到 3 个服务之类的替代方案。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "1. gateway：API 网关、鉴权转发……12. admin：后台管理（BFF，聚合调用其他服务）"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "第 1 周：A 搭 K8s、CI/CD、日志和监控、服务模板……第 4 周：notification、coupon、review 上线；report、admin 做最小版；全链路测试。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "风险（只说一次）：3 人维护 12 个服务，最大成本是运维和跨服务调试。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "方案如下，按你的决定执行。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答里没有按时间顺序叙述自己做过的步骤，只有方案和排期。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提出任何问题。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "默认假设：云上托管 K8s，消息队列用托管服务。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "全文没有开场客套、结尾客套或道歉，结尾“你要换，告诉我，我只改受影响部分。”是说明改动范围。"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "风险（只说一次）：3 人维护 12 个服务，最大成本是运维和跨服务调试。"
+        },
+        {
+          "id": "C2",
+          "pass": false,
+          "evidence": "回答只提了风险和对策，没有给出模块化单体或先只拆 2 到 3 个服务之类的替代方案。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "1. gateway：API 网关、鉴权转发……12. admin：后台管理（BFF，聚合调用其他服务）"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "第 1 周：A 搭 K8s、CI/CD、日志和监控、服务模板……第 4 周：notification、coupon、review 上线；report、admin 做最小版；全链路测试。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "风险（只说一次）：3 人维护 12 个服务，最大成本是运维和跨服务调试。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "方案如下，按你的决定执行。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答里没有按时间顺序叙述自己做过的步骤，只有方案和排期。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提出任何问题。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "默认假设：云上托管 K8s，消息队列用托管服务。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "全文没有开场客套、结尾客套或道歉，结尾“你要换，告诉我，我只改受影响部分。”是说明改动范围。"
+        }
+      ]
+    }
+  ]
+}

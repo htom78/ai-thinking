@@ -1,0 +1,64 @@
+{
+  "variant": "v25",
+  "scenario": "07-修一个时区bug",
+  "run": 1,
+  "answer": "**风险和未验证项（先看这个）**\n- 我没法运行代码，下面的结果是手算的，标为\"未验证\"。请在合并前跑一下文末的 3 行检查。\n- formatDate 有 14 处调用，其中财务对账 CSV 必须保持 UTC。所以我不改 formatDate 的默认行为，只给订单详情页换成新函数。其余 12 处我看不到上下文，不替你决定，清单在下面。\n\n**目标**\n订单详情页显示日本时间：接口值 \"2026-10-24T05:30:00Z\" 显示为 \"2026-10-24 14:30\"。财务 CSV 的输出一字不变。\n\n**改法（最小改动）**\n\n```js\n// utils/date.js\nconst p = (n) => String(n).padStart(2, '0');\n\n// 原函数不动：仍然是 UTC。财务对账 CSV 继续用它，输出不变。\nexport function formatDate(d) {\n  const x = new Date(d);\n  return `${x.getUTCFullYear()}-${p(x.getUTCMonth() + 1)}-${p(x.getUTCDate())} ${p(x.getUTCHours())}:${p(x.getUTCMinutes())}`;\n}\n\n// 新增：固定按日本时间显示，不依赖用户设备或服务器所在时区\nexport function formatDateJST(d) {\n  const parts = new Intl.DateTimeFormat('en-CA', {\n    timeZone: 'Asia/Tokyo',\n    year: 'numeric', month: '2-digit', day: '2-digit',\n    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',\n  }).formatToParts(new Date(d));\n  const g = (t) => parts.find((x) => x.type === t).value;\n  return `${g('year')}-${g('month')}-${g('day')} ${g('hour')}:${g('minute')}`;\n}\n```\n\n```jsx\n// OrderDetail.jsx\n<span>{formatDateJST(order.created_at)}</span>\n```\n\n不用 `getHours()` 的原因：它取的是运行环境的本地时区，在用户设备时区不是日本时（出差、海外），或在服务端渲染时，会再出一次同类 bug。写死 `Asia/Tokyo` 才稳。用 `hourCycle: 'h23'` 是为了避免午夜显示成 \"24:00\"。\n\n**验证（请跑一下，我没跑过）**\n```js\nformatDateJST(\"2026-10-24T05:30:00Z\")  // 期望 \"2026-10-24 14:30\"\nformatDateJST(\"2026-10-24T15:30:00Z\")  // 期望 \"2026-10-25 00:30\"（跨日）\nformatDate(\"2026-10-24T05:30:00Z\")     // 期望 \"2026-10-24 05:30\"（CSV 不变）\n```\n\n**需要你拍板：另外 12 处调用**\n这个 bug 很可能不只出现在订单详情页：其他给用户看的时间（订单列表、邮件、通知等）大概率也显示成了 UTC。我没有顺手改。建议你在项目里搜 `formatDate(`，按下面分三类，再决定哪些换成 formatDateJST：\n1. 面向日本用户展示的：换成 formatDateJST。\n2. 财务对账 CSV 等机器、对账用途：保持 formatDate。\n3. 拿不准的：先别动，问一下使用方。\n\n另外，为了防止以后有人误改 formatDate，建议给 CSV 那处调用加一个单测，固定一组 UTC 输入输出。这样改动不会悄悄影响财务。\n\n**顺带发现的另一个问题（没改，不在这次范围内）**\n`formatPrice` 里的 `yen * 1.1` 会产生浮点误差，比如 `¥1980.0000000000002`，而且税后金额没有取整。日元没有小数，应该明确是四舍五入、向下取整还是向上取整，这个口径需要财务或产品来定。你定了规则后，我可以一并改。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "原函数不动：仍然是 UTC。……新增：固定按日本时间显示，不依赖用户设备或服务器所在时区"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "我没有顺手改。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "这个 bug 很可能不只出现在订单详情页……`formatPrice` 里的 `yen * 1.1` 会产生浮点误差，比如 `¥1980.0000000000002`"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "订单详情页显示日本时间：接口值 \"2026-10-24T05:30:00Z\" 显示为 \"2026-10-24 14:30\"。……请在合并前跑一下文末的 3 行检查。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "其中财务对账 CSV 必须保持 UTC。所以我不改 formatDate 的默认行为"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": false,
+          "evidence": "回答开头是“风险和未验证项（先看这个）”和“我没法运行代码”，前两句没有给出判断或结果。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "不用 `getHours()` 的原因：它取的是运行环境的本地时区"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "你定了规则后，我可以一并改。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "建议你在项目里搜 `formatDate(`"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "我没有顺手改。"
+        }
+      ]
+    }
+  ]
+}

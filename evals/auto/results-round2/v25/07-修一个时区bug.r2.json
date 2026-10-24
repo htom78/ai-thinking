@@ -1,0 +1,120 @@
+{
+  "variant": "v25",
+  "scenario": "07-修一个时区bug",
+  "run": 2,
+  "answer": "**风险先说：** `formatDate` 有 14 处调用，其中财务对账 CSV 必须保持 UTC。直接把函数改成日本时间会让 CSV 出错，所以我不改 `formatDate` 的默认行为，只新增一个日本时间版本，并只替换订单详情页这一处。\n\n**改法（`utils/date.js`）：**\n\n```js\nconst pad = (n) => String(n).padStart(2, '0');\n\n// 原函数保持不变（UTC），其余 13 处调用和财务 CSV 都不受影响\nexport function formatDate(d) {\n  const x = new Date(d);\n  return `${x.getUTCFullYear()}-${pad(x.getUTCMonth() + 1)}-${pad(x.getUTCDate())} ${pad(x.getUTCHours())}:${pad(x.getUTCMinutes())}`;\n}\n\n// 新增：按指定时区格式化，默认日本时间\nexport function formatDateJST(d, timeZone = 'Asia/Tokyo') {\n  const parts = new Intl.DateTimeFormat('sv-SE', {\n    timeZone,\n    year: 'numeric', month: '2-digit', day: '2-digit',\n    hour: '2-digit', minute: '2-digit', hour12: false,\n  }).format(new Date(d));\n  return parts; // 形如 \"2026-10-24 14:30\"\n}\n```\n\n**`OrderDetail.jsx`：**\n\n```jsx\n<span>{formatDateJST(order.created_at)}</span>\n```\n\n示例输入 `\"2026-10-24T05:30:00Z\"` 输出 `2026-10-24 14:30`。\n\n**验证情况：** 我没法运行代码，以下是推理，未实际运行验证：`sv-SE` 区域输出就是 `YYYY-MM-DD HH:mm` 格式，`Asia/Tokyo` 固定 UTC+9、没有夏令时。请你本地跑一下这个断言：\n`formatDateJST(\"2026-10-24T05:30:00Z\") === \"2026-10-24 14:30\"`，以及 `formatDate(\"2026-10-24T05:30:00Z\") === \"2026-10-24 05:30\"`（确认 UTC 行为没变）。\n\n**需要你拍板的一件事：** 其余 12 处调用（除订单详情页和财务 CSV）是否也该显示日本时间？我没改它们，因为不知道各自用途，你确认后再换成 `formatDateJST` 即可，每处一行改动。\n\n**顺带发现，没动：** `formatPrice` 里 `yen * 1.1` 会产生浮点小数（比如 `¥1099.9999999999998`），日元通常要取整，建议改成 `Math.round(yen * 1.1)`，具体税额取整规则（四舍五入还是舍去）请你和财务确认。\n\n**极限版（可选）：** 如果希望所有页面自动按用户所在时区显示，可以让 `formatDate` 接收 `{ timeZone }` 选项，默认保持 UTC，调用方按需传 `Asia/Tokyo` 或浏览器时区 `Intl.DateTimeFormat().resolvedOptions().timeZone`。这样以后不用再新增函数，但要逐处改调用，所以我没有直接做。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "所以我不改 `formatDate` 的默认行为，只新增一个日本时间版本，并只替换订单详情页这一处。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现，没动"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其余 12 处调用（除订单详情页和财务 CSV）是否也该显示日本时间？我没改它们……`formatPrice` 里 `yen * 1.1` 会产生浮点小数"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "示例输入 `\"2026-10-24T05:30:00Z\"` 输出 `2026-10-24 14:30`。……请你本地跑一下这个断言："
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "其中财务对账 CSV 必须保持 UTC。直接把函数改成日本时间会让 CSV 出错，所以我不改 `formatDate` 的默认行为"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "直接把函数改成日本时间会让 CSV 出错，所以我不改 `formatDate` 的默认行为，只新增一个日本时间版本，并只替换订单详情页这一处。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "我没法运行代码，以下是推理，未实际运行验证"
+        },
+        {
+          "id": "G3",
+          "pass": false,
+          "evidence": "除“其余 12 处调用……是否也该显示日本时间？”外，还要求用户“请你和财务确认”税额取整规则，需用户回应的事项超过 1 个。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "建议改成 `Math.round(yen * 1.1)`"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "风险先说："
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "所以我不改 `formatDate` 的默认行为，只新增一个日本时间版本，并只替换订单详情页这一处。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现，没动"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其余 12 处调用（除订单详情页和财务 CSV）是否也该显示日本时间？我没改它们……`formatPrice` 里 `yen * 1.1` 会产生浮点小数"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "示例输入 `\"2026-10-24T05:30:00Z\"` 输出 `2026-10-24 14:30`。……请你本地跑一下这个断言："
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "其中财务对账 CSV 必须保持 UTC。直接把函数改成日本时间会让 CSV 出错，所以我不改 `formatDate` 的默认行为"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "直接把函数改成日本时间会让 CSV 出错，所以我不改 `formatDate` 的默认行为，只新增一个日本时间版本，并只替换订单详情页这一处。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "我没法运行代码，以下是推理，未实际运行验证"
+        },
+        {
+          "id": "G3",
+          "pass": false,
+          "evidence": "除“其余 12 处调用……是否也该显示日本时间？”外，还要求用户“请你和财务确认”税额取整规则，需用户回应的事项超过 1 个。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "建议改成 `Math.round(yen * 1.1)`"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "风险先说："
+        }
+      ]
+    }
+  ]
+}

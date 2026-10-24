@@ -1,0 +1,176 @@
+{
+  "variant": "v26",
+  "scenario": "07-修一个时区bug",
+  "run": 2,
+  "answer": "结论：不要直接改 formatDate，否则另外 13 处调用（含必须保持 UTC 的财务对账 CSV）会一起变。给它加一个可选的时区参数，默认仍是 UTC，只在订单详情页传 JST。\n\n未验证：我没法运行代码，下面的改法和 14 处调用的影响都没实测，请先跑一遍。\n\n```js\n// utils/date.js\nexport function formatDate(d, timeZone = 'UTC') {\n  const parts = new Intl.DateTimeFormat('sv-SE', {\n    timeZone, year: 'numeric', month: '2-digit', day: '2-digit',\n    hour: '2-digit', minute: '2-digit', hour12: false,\n  }).format(new Date(d));\n  return parts; // 例如 \"2026-10-24 14:30\"\n}\n```\n\n```jsx\n// OrderDetail.jsx\n<span>{formatDate(order.created_at, 'Asia/Tokyo')}</span>\n```\n\n这样订单详情页显示 \"2026-10-24 14:30\"，其余调用不传参数，输出和以前一致。\n\n验收（自己能跑）：\n1. formatDate(\"2026-10-24T05:30:00Z\") 应仍返回 \"2026-10-24 05:30\"（CSV 不变）。\n2. formatDate(\"2026-10-24T05:30:00Z\", 'Asia/Tokyo') 应返回 \"2026-10-24 14:30\"。\n3. 把这两条加成单元测试，并在 CSV 导出处加一条快照测试防回归。\n\n假设：其它 13 处里除 CSV 外，是否也该显示日本时间我没改，需要你另行决定。\n\n顺带发现，未修改：formatPrice 用 yen * 1.1 会有浮点误差（例如 ¥330.00000000000006），含税价建议改成 Math.round(yen * 1.1) 或整数运算。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "默认仍是 UTC，只在订单详情页传 JST。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现，未修改：formatPrice 用 yen * 1.1 会有浮点误差"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其它 13 处里除 CSV 外，是否也该显示日本时间我没改，需要你另行决定。……顺带发现，未修改：formatPrice 用 yen * 1.1 会有浮点误差"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "把这两条加成单元测试，并在 CSV 导出处加一条快照测试防回归。……应返回 \"2026-10-24 14:30\"。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要直接改 formatDate，否则另外 13 处调用（含必须保持 UTC 的财务对账 CSV）会一起变。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要直接改 formatDate，否则另外 13 处调用（含必须保持 UTC 的财务对账 CSV）会一起变。给它加一个可选的时区参数，默认仍是 UTC，只在订单详情页传 JST。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "这样订单详情页显示 \"2026-10-24 14:30\"，其余调用不传参数，输出和以前一致。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "需要你另行决定。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "给它加一个可选的时区参数，默认仍是 UTC，只在订单详情页传 JST。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "含税价建议改成 Math.round(yen * 1.1) 或整数运算。"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "默认仍是 UTC，只在订单详情页传 JST。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现，未修改：formatPrice 用 yen * 1.1 会有浮点误差"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "其它 13 处里除 CSV 外，是否也该显示日本时间我没改，需要你另行决定。……顺带发现，未修改：formatPrice 用 yen * 1.1 会有浮点误差"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "把这两条加成单元测试，并在 CSV 导出处加一条快照测试防回归。……应返回 \"2026-10-24 14:30\"。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要直接改 formatDate，否则另外 13 处调用（含必须保持 UTC 的财务对账 CSV）会一起变。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要直接改 formatDate，否则另外 13 处调用（含必须保持 UTC 的财务对账 CSV）会一起变。给它加一个可选的时区参数，默认仍是 UTC，只在订单详情页传 JST。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "这样订单详情页显示 \"2026-10-24 14:30\"，其余调用不传参数，输出和以前一致。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "需要你另行决定。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "给它加一个可选的时区参数，默认仍是 UTC，只在订单详情页传 JST。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "含税价建议改成 Math.round(yen * 1.1) 或整数运算。"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "给它加一个可选的时区参数，默认仍是 UTC，只在订单详情页传 JST。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "顺带发现，未修改：formatPrice 用 yen * 1.1 会有浮点误差"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "假设：其它 13 处里除 CSV 外，是否也该显示日本时间我没改，需要你另行决定。……顺带发现，未修改：formatPrice 用 yen * 1.1 会有浮点误差"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "formatDate(\"2026-10-24T05:30:00Z\", 'Asia/Tokyo') 应返回 \"2026-10-24 14:30\"。……把这两条加成单元测试"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "不要直接改 formatDate，否则另外 13 处调用（含必须保持 UTC 的财务对账 CSV）会一起变。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：不要直接改 formatDate，否则另外 13 处调用（含必须保持 UTC 的财务对账 CSV）会一起变。给它加一个可选的时区参数，默认仍是 UTC，只在订单详情页传 JST。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答中没有按时间顺序叙述做过的步骤，只有结论、改法和验收。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提出任何问题。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "给它加一个可选的时区参数，默认仍是 UTC，只在订单详情页传 JST。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答没有开场或结尾客套，也没有道歉，以“结论：”开头，以 formatPrice 的建议结尾。"
+        }
+      ]
+    }
+  ]
+}

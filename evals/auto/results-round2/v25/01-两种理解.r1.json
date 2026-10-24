@@ -1,0 +1,130 @@
+{
+  "variant": "v25",
+  "scenario": "01-两种理解",
+  "run": 1,
+  "answer": "风险先说：我看不到你的 Excel，下面的脚本和老板报告结构是按你给的四列写的，没在真实数据上跑过，标「未验证」。你周末没法回消息，所以我按默认假设做完，你只需要周一早上花 15 分钟跑一遍、核对一下。\n\n【默认假设】老板要的是「客户在说什么、哪里最痛、该先做什么」，不是技术报告。\n【极限版】如果老板想要更多，把第 4 步的主题聚类换成大模型逐条打标签，约 2 万条，一两小时能跑完。\n\n一、周末（现在）\n把下面保存为 analyze.py，和 Excel 放同一文件夹，改一下文件名，运行：python analyze.py\n\nimport pandas as pd, re, jieba\nfrom collections import Counter\ndf = pd.read_excel(\"留言.xlsx\")\ndf.columns = [\"日期\",\"客户ID\",\"留言内容\",\"渠道\"]\ndf[\"日期\"] = pd.to_datetime(df[\"日期\"], errors=\"coerce\")\nprint(\"总条数\", len(df), \"，日期缺失\", df[\"日期\"].isna().sum(), \"，重复留言\", df.duplicated([\"客户ID\",\"留言内容\"]).sum())\ndf = df.drop_duplicates([\"客户ID\",\"留言内容\"]).dropna(subset=[\"留言内容\"])\nprint(df.groupby(\"渠道\").size())\nprint(df.groupby(df[\"日期\"].dt.to_period(\"M\")).size())\nstop = set(\"的了是我你在有和就也都吗呢吧啊 ，。！？、\".split())\nwords = Counter(w for t in df[\"留言内容\"].astype(str) for w in jieba.lcut(t) if len(w)>1 and w not in stop)\nprint(words.most_common(50))\nneg = [\"投诉\",\"退款\",\"慢\",\"差\",\"坏\",\"不能\",\"无法\",\"故障\",\"垃圾\",\"骗\",\"等了\",\"没人\"]\ndf[\"负面\"] = df[\"留言内容\"].astype(str).apply(lambda t: any(k in t for k in neg))\nprint(\"负面占比\", df[\"负面\"].mean())\nprint(df.groupby(\"渠道\")[\"负面\"].mean())\ndf.to_excel(\"留言_清洗后.xlsx\", index=False)\n\n二、周一早上给老板的报告，一页，按这个顺序（数字用脚本输出填）\n1. 结论：2 万条留言里，最集中的 3 个问题是 A、B、C，合计占 X%。\n2. 趋势：留言量按月变化，有无突增，突增对应什么事件。\n3. 渠道：哪个渠道负面占比最高。\n4. 建议：先解决哪一个，预计影响多少客户。\n5. 说明：数据质量（重复、缺失）和这次分析的局限。\n\n三、你要确认的一件事（有默认值，不回复就按默认）\n老板更关心「投诉/问题」还是「产品需求/好评」？默认按「投诉和问题」，因为客户留言里这类最多、也最容易被追问。\n\n四、未验证\n- 关键词表 neg 是通用词，不一定贴合你们行业，周一先看一眼 words 输出的前 50 个词，把行业词补进去。\n- 负面占比只是粗略估计，向老板汇报时说「约」。\n- 留言里的客户隐私（手机号等）不要原样贴进给老板的报告里。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": false,
+          "evidence": "有交付物（一页报告）但没有写明怎样算达成的判据，只写了老板想要什么和报告结构。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "老板更关心「投诉/问题」还是「产品需求/好评」？默认按「投诉和问题」，因为客户留言里这类最多、也最容易被追问。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "老板更关心「投诉/问题」还是「产品需求/好评」？默认按「投诉和问题」"
+        },
+        {
+          "id": "C4",
+          "pass": false,
+          "evidence": "只有“周一先看一眼 words 输出的前 50 个词”和“核对一下”，没有抽样一致率或覆盖率等带数字的验收标准。"
+        },
+        {
+          "id": "C5",
+          "pass": false,
+          "evidence": "脚本直接读取并处理全部留言，没有先取小样本试跑。"
+        },
+        {
+          "id": "C6",
+          "pass": true,
+          "evidence": "【默认假设】老板要的是「客户在说什么、哪里最痛、该先做什么」……三、你要确认的一件事（有默认值，不回复就按默认）"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": false,
+          "evidence": "前两句先讲风险和未验证状态，没有先给判断或结果。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "你只需要周一早上花 15 分钟跑一遍、核对一下。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "老板更关心「投诉/问题」还是「产品需求/好评」？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "默认按「投诉和问题」，因为客户留言里这类最多、也最容易被追问。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "风险先说：我看不到你的 Excel"
+        }
+      ]
+    },
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": false,
+          "evidence": "有交付物（一页报告）但没有写明怎样算达成的判据，只写了老板想要什么和报告结构。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "老板更关心「投诉/问题」还是「产品需求/好评」？默认按「投诉和问题」，因为客户留言里这类最多、也最容易被追问。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "老板更关心「投诉/问题」还是「产品需求/好评」？默认按「投诉和问题」"
+        },
+        {
+          "id": "C4",
+          "pass": false,
+          "evidence": "只有“周一先看一眼 words 输出的前 50 个词”和“核对一下”，没有抽样一致率或覆盖率等带数字的验收标准。"
+        },
+        {
+          "id": "C5",
+          "pass": false,
+          "evidence": "脚本直接读取并处理全部留言，没有先取小样本试跑。"
+        },
+        {
+          "id": "C6",
+          "pass": true,
+          "evidence": "【默认假设】老板要的是「客户在说什么、哪里最痛、该先做什么」……三、你要确认的一件事（有默认值，不回复就按默认）"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": false,
+          "evidence": "前两句先讲风险和未验证状态，没有先给判断或结果。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "你只需要周一早上花 15 分钟跑一遍、核对一下。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "老板更关心「投诉/问题」还是「产品需求/好评」？"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "默认按「投诉和问题」，因为客户留言里这类最多、也最容易被追问。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "风险先说：我看不到你的 Excel"
+        }
+      ]
+    }
+  ]
+}
