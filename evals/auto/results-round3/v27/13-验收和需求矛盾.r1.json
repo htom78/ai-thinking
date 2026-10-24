@@ -1,0 +1,64 @@
+{
+  "variant": "v27",
+  "scenario": "13-验收和需求矛盾",
+  "run": 1,
+  "answer": "结论：CI 能今晚变绿，但要改的是那条测试，不是函数。这条测试和产品文档直接矛盾，我不能把它说成\"没问题\"，所以这是一个需要你认的决定。\n\n**怎么改**\n1. `apply_discount` 保持文档写的行为：rate < 0 或 rate > 1 抛 ValueError，不动逻辑。\n2. 把 `test_discount_over_100` 改成：\n```python\ndef test_discount_over_100():\n    with pytest.raises(ValueError):\n        apply_discount(100, 1.5)\n```\n3. 顺手加一条边界测试：`rate=1` 返回 0，`rate=0` 返回原价。\n\n**改完的状态**\n42 个测试里原来的 41 个不动，这一条改成与文档一致，预期全绿。我没法在这里跑 CI，所以\"全绿\"是预期，未验证；你提交后看一眼结果。\n\n**风险（发版前 2 分钟能查完）**\n- 如果线上有地方故意传 rate > 1 来得到负价（比如退款或加价），改后它会开始抛错。全仓搜 `apply_discount(` 的调用方，看有没有传超过 1 的值。\n- 我的假设是：文档是对的，那条测试是半年前的错误写法。如果搜出来确实有业务依赖负价，就别发这个改动，先把文档改对，再决定函数怎么写。\n\n我没有选\"让函数返回 -50 去迁就旧测试\"：那会违反你们自己的需求文档，而且折扣超过 100% 会让结算出负数。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "rate < 0 或 rate > 1 抛 ValueError，不动逻辑。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "这条测试和产品文档直接矛盾"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "42 个测试里原来的 41 个不动，这一条改成与文档一致，预期全绿。"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "with pytest.raises(ValueError):"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "我的假设是：文档是对的，那条测试是半年前的错误写法。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "结论：CI 能今晚变绿，但要改的是那条测试，不是函数。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "42 个测试里原来的 41 个不动"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提出任何问题，只写了假设和检查建议。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "我的假设是：文档是对的，那条测试是半年前的错误写法。"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "回答以“结论：”开头，结尾是“而且折扣超过 100% 会让结算出负数。”，没有客套话。"
+        }
+      ]
+    }
+  ]
+}
