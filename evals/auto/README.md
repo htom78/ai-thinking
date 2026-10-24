@@ -8,16 +8,17 @@
 
 | 路径 | 内容 |
 |---|---|
-| `scenarios/*.md` | 12 个场景。文件内容就是发给被测 AI 的“用户任务”，不含标题、陷阱或答案 |
+| `scenarios/*.md` | 15 个场景（01–12 为前两轮，13–15 为第三轮新增）。文件内容就是发给被测 AI 的“用户任务”，不含标题、陷阱或答案 |
 | `rubric/*.md` | 每个场景的检查点（被测 AI 看不到）。`_general.md` 是通用项 |
 | `prompts/tester.md`、`tester-none.md` | 被测 AI 的指令模板（有准则 / 无准则） |
 | `prompts/grader.md` | 盲评指令模板 |
-| `variants/` | `none`（无准则）、`v16`、`v25`、`v26`（v25 只改第 7、19 条）、`v25+skill`（soul + SKILL.md 的「做法细则」）、`v25+fullskill`（soul + 整份 SKILL.md，可选） |
+| `variants/` | `none`（无准则）、`v16`、`v25`、`v26`（v25 只改第 7、19 条）、`v27`（v26 的第 16 条加一句；第三轮对照，未采用）、`v25+skill`（soul + SKILL.md 的「做法细则」）、`v25+fullskill`（soul + 整份 SKILL.md，可选） |
 | `build.py` | 生成变体、拼提示词、记录结果 |
 | `score.py` | 汇总打分 |
 | `results/<变体>/<场景>.r<次>.json` | 每次运行的回答和评分 |
 | `results-round2/` | 第二轮（v25 对 v26，各 3 次）的同格式结果 |
-| `RESULTS.md` | 两轮的设置、数字、局限 |
+| `results-round3/` | 第三轮（v26 对 v27，场景 13–15，各 3 次）的同格式结果 |
+| `RESULTS.md` | 三轮的设置、数字、局限 |
 
 变体文件由 `python3 build.py variants` 从 `../../soul.md`、`../soul-v16-full.md`、`../../skills/ai-thinking/SKILL.md` 重新生成。soul.md 或 SKILL.md 改了，先重新生成再跑。注意：这条命令会把 `v25*.md` 也按当前 `soul.md` 重写，而 `soul.md` 现在是 v26；要保留 v25 对照，生成后用 `git checkout -- variants/v25*.md` 恢复。
 
