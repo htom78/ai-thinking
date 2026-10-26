@@ -8,17 +8,19 @@
 
 | 路径 | 内容 |
 |---|---|
-| `scenarios/*.md` | 15 个场景（01–12 为前两轮，13–15 为第三轮新增）。文件内容就是发给被测 AI 的“用户任务”，不含标题、陷阱或答案 |
+| `scenarios/*.md` | 17 个场景（01–12 为前两轮，13–15 为第三轮新增，16–17 为第四轮新增）。文件内容就是发给被测 AI 的“用户任务”，不含标题、陷阱或答案 |
 | `rubric/*.md` | 每个场景的检查点（被测 AI 看不到）。`_general.md` 是通用项 |
 | `prompts/tester.md`、`tester-none.md` | 被测 AI 的指令模板（有准则 / 无准则） |
 | `prompts/grader.md` | 盲评指令模板 |
-| `variants/` | `none`（无准则）、`v16`、`v25`、`v26`（v25 只改第 7、19 条）、`v27`（v26 的第 16 条加一句；第三轮对照，未采用）、`v25+skill`（soul + SKILL.md 的「做法细则」）、`v25+fullskill`（soul + 整份 SKILL.md，可选） |
+| `variants/` | `none`（无准则）、`v16`、`v25`、`v26`（v25 只改第 7、19 条）、`v27`（v26 的第 16 条加一句；第三轮对照，未采用）、`v28`（v26 的第 5 条加一句；第四轮对照，未采用）、`v25+skill`（soul + SKILL.md 的「做法细则」）、`v25+fullskill`（soul + 整份 SKILL.md，可选） |
 | `build.py` | 生成变体、拼提示词、记录结果 |
 | `score.py` | 汇总打分 |
 | `results/<变体>/<场景>.r<次>.json` | 每次运行的回答和评分 |
 | `results-round2/` | 第二轮（v25 对 v26，各 3 次）的同格式结果 |
 | `results-round3/` | 第三轮（v26 对 v27，场景 13–15，各 3 次）的同格式结果 |
-| `RESULTS.md` | 三轮的设置、数字、局限 |
+| `results-round4/` | 第四轮（none / v26 / v28，场景 15–17）的同格式结果；每个变体的场景不同，见 RESULTS.md |
+| `rubric-round3/` | 第三轮用的旧版 15 号评分标准；第 4 轮前重写了 `rubric/15-该问没问.md`，复现第三轮要加 `--rubric-dir rubric-round3` |
+| `RESULTS.md` | 四轮的设置、数字、局限 |
 
 变体文件由 `python3 build.py variants` 从 `../../soul.md`、`../soul-v16-full.md`、`../../skills/ai-thinking/SKILL.md` 重新生成。soul.md 或 SKILL.md 改了，先重新生成再跑。注意：这条命令会把 `v25*.md` 也按当前 `soul.md` 重写，而 `soul.md` 现在是 v26；要保留 v25 对照，生成后用 `git checkout -- variants/v25*.md` 恢复。
 
@@ -117,3 +119,8 @@ python3 score.py --baseline v16 --detail
 1. 在 `scenarios/` 写场景，文件内容只放发给 AI 的任务。
 2. 在 `rubric/` 写同名文件：头部 `scenario`、`max_chars`、`traps`，然后每行一个检查点，格式 `- **C1** (第 N 条) 写明怎样算有`。每个检查点只挂一条规则，4 到 6 个。
 3. `python3 build.py list` 确认能读出来。
+
+## 第 4 轮说明
+
+- 场景 15 的评分标准在第 4 轮前重写：C1/C2 改成 Ask-F1 式标准（默认受众 + 点明唯一决定，或只问一个带默认的问题），C5 改为“不假装已执行”，不再与 C3 重叠；场景文本未改。**第 3 轮的 15 号数字与第 4 轮不可比。**旧标准留在 `rubric-round3/15-该问没问.md`，`score.py --rubric-dir rubric-round3` 优先用该目录里的同名标准、没有的回退到 `rubric/`，所以第三轮的 89% / 78% 仍可复现。
+- 新增场景 16（说明和代码冲突）、17（禁止类说明不能被代码覆盖，对照），变体 v28 = v26 + 第 5 条追加一句。

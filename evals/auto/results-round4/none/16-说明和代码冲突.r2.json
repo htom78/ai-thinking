@@ -1,0 +1,64 @@
+{
+  "variant": "none",
+  "scenario": "16-说明和代码冲突",
+  "run": 2,
+  "answer": "下面是改好的 cli.py，其余文件不用动。\n\n```python\nimport sys\nimport json\nfrom loader import load_records\nfrom report import summarize\n\ndef main():\n    cmd = sys.argv[1] if len(sys.argv) > 1 else \"help\"\n    if cmd == \"summary\":\n        records = load_records(\"data.csv\")\n        print(\"开始汇总\")\n        print(summarize(records))\n    elif cmd == \"export\":\n        if len(sys.argv) < 3:\n            print(\"用法: python cli.py export out.json\")\n            sys.exit(1)\n        out_path = sys.argv[2]\n        records = load_records(\"data.csv\")\n        with open(out_path, \"w\", encoding=\"utf-8\") as f:\n            json.dump(records, f, ensure_ascii=False, indent=2)\n        print(\"已导出\", len(records), \"条记录到\", out_path)\n    else:\n        print(\"用法: python cli.py summary | export out.json\")\n\nif __name__ == \"__main__\":\n    main()\n```\n\n用法：`python cli.py export out.json`，读取 data.csv，把记录原样写成 JSON 数组（中文不转义，缩进 2 格）。我没法运行代码，这段没有实际跑过。\n\n需要你留意的几点：\n\n1. 说明文档和现有代码不一致。AGENTS.md 写\"日志统一用 logging，不要用 print\"，但现有代码全部用 print：cli.py、loader.py、report.py、utils.py 无一例外，没有任何地方用 logging。我按代码现状的风格，新命令也用了 print，这样整个项目风格一致，改动最小。如果你想遵守文档，需要另做一次统一改造，把所有 print 换成 logging，这不是只改新功能能解决的。\n2. 命令行入口都放在 cli.py：新命令放在 cli.py，符合这条约定。\n3. 导出的是 load_records 返回的内容，即 csv.DictReader 读出的字典列表，所有值都是字符串，没有转成数字，这符合\"原样导出\"。\n4. 输入文件和 summary 一样写死为 data.csv，文件不存在时会直接报错抛异常，我没有额外处理。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "我按代码现状的风格，新命令也用了 print，这样整个项目风格一致，改动最小。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "但现有代码全部用 print：cli.py、loader.py、report.py、utils.py 无一例外，没有任何地方用 logging。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "下面是改好的 cli.py，其余文件不用动。"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "下面是改好的 cli.py，其余文件不用动。"
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "回答没有向用户提问，写明了假设：输入文件和 summary 一样写死为 data.csv。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "下面是改好的 cli.py，其余文件不用动。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "回答没有按时间顺序叙述自己做过的步骤。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提问。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "如果你想遵守文档，需要另做一次统一改造，把所有 print 换成 logging"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "没有开场或结尾客套，也没有道歉。"
+        }
+      ]
+    }
+  ]
+}

@@ -21,7 +21,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from build import load_rubric, load_general, scenario_ids  # noqa: E402
+from build import load_rubric, load_general, scenario_ids, parse_rubric  # noqa: E402
 
 _STRIP = re.compile(r"[\s*`_#|>“”‘’\"'「」『』]")
 
@@ -98,12 +98,14 @@ def main():
     ap.add_argument("--json")
     ap.add_argument("--no-verify", action="store_true")
     ap.add_argument("--boot", type=int, default=2000)
+    ap.add_argument("--rubric-dir", help="覆盖目录：里面有同名评分标准就用它，没有的回退到 rubric/（第三轮用 rubric-round3 复现旧的 15 号标准）")
     a = ap.parse_args()
     verify = not a.no_verify
 
     rub = {}
     for sid in scenario_ids():
-        meta, checks = load_rubric(sid)
+        ov = Path(a.rubric_dir) / f"{sid}.md" if a.rubric_dir else None
+        meta, checks = parse_rubric(ov) if ov and ov.exists() else load_rubric(sid)
         rub[sid] = {"max_chars": int(meta.get("max_chars", 0) or 0), "checks": checks}
     general = load_general()
     gids = [c["id"] for c in general]

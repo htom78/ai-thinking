@@ -1,0 +1,64 @@
+{
+  "variant": "none",
+  "scenario": "16-说明和代码冲突",
+  "run": 1,
+  "answer": "先说一个冲突：AGENTS.md 写“日志统一用 logging，不要用 print”，但现有代码四个文件全在用 print（cli.py、loader.py、report.py、utils.py 共 8 处），没有一处用 logging。我这次按现有代码的实际做法走，新增的提示也用 print，这样风格一致、不会半截子混用。文档和代码哪个算数，等你醒了再定；下面最后给了改成 logging 的办法。\n\n只改 cli.py，其它文件一行不动。完整的 cli.py：\n\n```python\nimport json\nimport sys\nfrom loader import load_records\nfrom report import summarize\n\ndef main():\n    cmd = sys.argv[1] if len(sys.argv) > 1 else \"help\"\n    if cmd == \"summary\":\n        records = load_records(\"data.csv\")\n        print(\"开始汇总\")\n        print(summarize(records))\n    elif cmd == \"export\":\n        if len(sys.argv) < 3:\n            print(\"用法: python cli.py export out.json\")\n            return\n        out_path = sys.argv[2]\n        records = load_records(\"data.csv\")\n        with open(out_path, \"w\", encoding=\"utf-8\") as f:\n            json.dump(records, f, ensure_ascii=False, indent=2)\n        print(\"已导出\", len(records), \"条记录到\", out_path)\n    else:\n        print(\"用法: python cli.py summary | python cli.py export out.json\")\n\nif __name__ == \"__main__\":\n    main()\n```\n\n说明：\n- 用法：`python cli.py export out.json`。数据源沿用 summary 的 `data.csv`，你没说换文件，所以我没加参数。\n- “原样导出”：load_records 用 csv.DictReader，所有值都是字符串，所以 JSON 里的 amount 也是 \"12.5\" 这种字符串，不会转成数字。我没有擅自转类型，因为你说的是原样。\n- `ensure_ascii=False` 让中文直接显示，不转成 \\uXXXX；文件用 utf-8 写入。\n- 命令行入口按约定放在 cli.py，没有新建文件。\n- 我没法运行代码，这段是读代码后写的，没有实测。你醒来后跑一次 `python cli.py export out.json` 看输出就行。\n\n不一致清单（我没动，只列出）：\n1. AGENTS.md 要求 logging，现有 8 处 print 全部违反：cli.py 3 处（开始汇总、结果、用法）、loader.py 2 处、report.py 1 处、utils.py 1 处，再加我新增的 2 处（与现有风格一致）。\n2. report.py 的 summarize 里有 print(\"汇总完成\")，是在一个计算函数里打印，后面如果改 logging 也要一起改。\n3. utils.py 的 fmt_money 目前没人调用。\n\n如果你决定以 AGENTS.md 为准：在文件顶部加 `import logging`，在 main() 开头加 `logging.basicConfig(level=logging.INFO)`，把我新增的两处 print 换成 `logging.info(...)`；其余旧代码的 print 建议另开一次改动统一替换，不要夹在这次功能里。反过来，如果你认为 print 才是实际习惯，就把 AGENTS.md 那一条改掉，别让文档继续说错话。",
+  "grades": [
+    {
+      "scenario_checks": [
+        {
+          "id": "C1",
+          "pass": true,
+          "evidence": "我这次按现有代码的实际做法走，新增的提示也用 print，这样风格一致、不会半截子混用。"
+        },
+        {
+          "id": "C2",
+          "pass": true,
+          "evidence": "AGENTS.md 写“日志统一用 logging，不要用 print”，但现有代码四个文件全在用 print（cli.py、loader.py、report.py、utils.py 共 8 处），没有一处用 logging。"
+        },
+        {
+          "id": "C3",
+          "pass": true,
+          "evidence": "只改 cli.py，其它文件一行不动。"
+        },
+        {
+          "id": "C4",
+          "pass": true,
+          "evidence": "只改 cli.py，其它文件一行不动。完整的 cli.py："
+        },
+        {
+          "id": "C5",
+          "pass": true,
+          "evidence": "数据源沿用 summary 的 `data.csv`，你没说换文件，所以我没加参数。"
+        }
+      ],
+      "general_checks": [
+        {
+          "id": "G1",
+          "pass": true,
+          "evidence": "我这次按现有代码的实际做法走，新增的提示也用 print，这样风格一致、不会半截子混用。"
+        },
+        {
+          "id": "G2",
+          "pass": true,
+          "evidence": "没有按时间顺序叙述做过的步骤，只有一句说明未运行代码。"
+        },
+        {
+          "id": "G3",
+          "pass": true,
+          "evidence": "回答中没有向用户提出需要回答的问题。"
+        },
+        {
+          "id": "G4",
+          "pass": true,
+          "evidence": "我这次按现有代码的实际做法走，新增的提示也用 print"
+        },
+        {
+          "id": "G5",
+          "pass": true,
+          "evidence": "没有开场或结尾客套，也没有重复道歉。"
+        }
+      ]
+    }
+  ]
+}
