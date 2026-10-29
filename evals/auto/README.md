@@ -13,6 +13,7 @@
 | `prompts/tester.md`、`tester-none.md` | 被测 AI 的指令模板（有准则 / 无准则） |
 | `prompts/grader.md` | 盲评指令模板 |
 | `variants/` | `none`（无准则）、`v16`、`v25`、`v26`（v25 只改第 7、19 条）、`v27`（v26 的第 16 条加一句；第三轮对照，未采用）、`v28`（v26 的第 5 条加一句；第四轮对照，未采用）、`v25+skill`（soul + SKILL.md 的「做法细则」）、`v25+fullskill`（soul + 整份 SKILL.md，可选） |
+| 注意 | 2026-10-29 起现行 `soul.md` 是 v29（新增第 6 条，原第 6–25 条顺延 +1）。本目录打分表、变体、结果里的「第 N 条」都是 v25/v26 当时的编号，未改。 |
 | `build.py` | 生成变体、拼提示词、记录结果 |
 | `score.py` | 汇总打分 |
 | `results/<变体>/<场景>.r<次>.json` | 每次运行的回答和评分 |
