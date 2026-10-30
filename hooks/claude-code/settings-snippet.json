@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "$HOME/.agents/skills/ai-thinking/hooks/soul-reminder.sh" }
+        ]
+      }
+    ]
+  }
+}

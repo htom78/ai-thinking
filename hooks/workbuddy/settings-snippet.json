@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "/Users/<你的用户名>/.agents/skills/ai-thinking/hooks/soul-reminder.sh", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}
