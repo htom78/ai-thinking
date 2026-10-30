@@ -14,7 +14,7 @@
 
 八步流程很重，只在大任务（目标、项目、难题、人生决策）时触发。日常小任务不走八步。
 
-[`soul.md`](soul.md) 始终生效，可以单独使用。八步流程只在大任务时触发，触发之后仍然遵守 `soul.md`。正文二十六条，每条只写触发条件和默认动作，分四个阶段：动手前、要人决策时、执行中、收尾。每条的做法细则（格式、步骤、理由）在 [`SKILL.md`](skills/ai-thinking/SKILL.md) 的「做法细则」一节。怎么装、怎么确认生效、怎么按自己的经验改，见下一节。
+[`soul.md`](soul.md) 始终生效，可以单独使用。八步流程只在大任务时触发，触发之后仍然遵守 `soul.md`。正文二十六条，每条只写触发条件和默认动作，分四个阶段：动手前、要人决策时、执行中、收尾。每条的做法细则（格式、步骤、理由）在 [`SKILL.md`](skills/ai-thinking/SKILL.md) 的「做法细则」一节。怎么装、怎么确认生效、怎么按自己的经验改，见下一节。加载了不等于每轮照做：让 Claude Code、WorkBuddy、ChatGPT、Claude 网页每轮再提醒三条的办法，见 [`每轮提醒.md`](每轮提醒.md)。
 
 ## 怎么用 soul.md
 
@@ -146,6 +146,7 @@ done
 
 ## 更新记录
 
+- 2026-10-30：v31，`soul.md` 正文不变（仍为二十六条，编号不变），新增每轮提醒。正本 [`reminder.md`](reminder.md)：三行，对应第 8 条（决策单）、第 6 条（审结论）、第 18 条（附证据）。Claude Code 的 `UserPromptSubmit` hook [`hooks/claude-code/soul-reminder.sh`](hooks/claude-code/soul-reminder.sh) 每轮读它；[`hooks/install-hooks.py`](hooks/install-hooks.py) 把 hook 合并进 `~/.claude/settings.json` 或 `~/.workbuddy/settings.json`（先备份）。WorkBuddy hook 能否把输出送进上下文未验证，兜底是 `install.sh` 把提醒附在个人目录 `SOUL.md` 末尾。ChatGPT、Claude 网页没有 hook，提醒放进指令最前面（[`portable/chatgpt/`](portable/chatgpt/)、[`portable/claude/`](portable/claude/)）。[`scripts/sync_reminder.py`](scripts/sync_reminder.py) 检查条号和标题对得上 `soul.md`、各副本一致，`--write` 重新生成。`install.sh` 改为把 `~/.agents/soul.md` 做成软链接（旧实体文件备份到 `~/.Trash`），避免一份更新了、另一份过期。各平台装法和确认办法见 [`每轮提醒.md`](每轮提醒.md)。WorkBuddy zip 内容没变，未重打。
 - 2026-10-30：`soul.md` 升到 v30，只改第 8 条，条号不变、仍为二十六条。第 8 条改为「只在分歧点问，最多问一个，先交决策单」：要问之前先交四项，缺一项就不许问——① 唯一推荐；② 查了什么，附来源或输出；③ 用第 6 条自审挑出的毛病，至少一条；④ 为什么必须由人定，只认花钱、对外发送、不可逆、只有人知道的偏好四种；④ 说不出就自己定了去做。[`SKILL.md`](skills/ai-thinking/SKILL.md)「做法细则」第 8 条加决策单模板和用户的固定回复（缺②或③一律回「先查再来」，不讨论内容）；ChatGPT、WorkBuddy 副本和 WorkBuddy 的 zip 同步。新增评测用例 [`002`](evals/cases/002-一堆没查的想法丢给人定.md)（一堆没查的想法丢给人定），未跑。
 - 2026-10-29：`soul.md` 升到 v29（v27、v28 已被评测里未采用的对照版占用，跳过），新增第 6 条「审别人的结论，先问四件事」：资料、网上说法、另一个 AI 的结论，先问理由是什么、藏着什么假设、证据靠不靠得住、有没有别的解释；问不过就不当事实用，标「未验证」。来源：Browne & Keeley《学会提问》。插在第 5 条「先看真东西，用真工具」之后，原第 6–25 条顺延为第 7–26 条，现为二十六条，**编号变了**（原 n→n+1，n≥6）。[`SKILL.md`](skills/ai-thinking/SKILL.md)「做法细则」新增第 6 条并同步编号（ChatGPT、WorkBuddy 副本和 WorkBuddy 的 zip 同步）；评测用例 001 条号同步（1、7、11、16，决策单第 8 条）。`evals/auto/` 的打分表、变体和结果是 v25/v26 当时的材料，条号保持原样，未重跑评测。
 - 2026-10-24：`soul.md` 升到 v26，只改第 7、19 条，更精简、答案先行，字数 1352 → 1391（+2.9%），条号不变。第 7 条改为默认不问、自己拍板写明假设，只有猜错比问一次代价大才问，且只问一个，附默认答案；第 19 条改为第一句就是结论或唯一推荐，不叙述做过的步骤，不写开场结尾客套，默认不超过 400 字。[`SKILL.md`](skills/ai-thinking/SKILL.md)「做法细则」第 7、19 条同步（ChatGPT、WorkBuddy 的副本和 WorkBuddy 的 zip 同步）。自动评测：场景得分 81% → 80%（噪声内），通用项 95% → 99%，平均字数 828 → 610，字数达标 64% → 78%；这是小幅改进，不是大胜，局限见 [`evals/auto/RESULTS.md`](evals/auto/RESULTS.md)。
