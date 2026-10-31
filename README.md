@@ -14,7 +14,7 @@
 
 八步流程很重，只在大任务（目标、项目、难题、人生决策）时触发。日常小任务不走八步。
 
-[`soul.md`](soul.md) 始终生效，可以单独使用。八步流程只在大任务时触发，触发之后仍然遵守 `soul.md`。正文二十六条，每条只写触发条件和默认动作，分四个阶段：动手前、要人决策时、执行中、收尾。每条的做法细则（格式、步骤、理由）在 [`SKILL.md`](skills/ai-thinking/SKILL.md) 的「做法细则」一节。怎么装、怎么确认生效、怎么按自己的经验改，见下一节。加载了不等于每轮照做：让 Claude Code、WorkBuddy、ChatGPT、Claude 网页每轮再提醒三条的办法，见 [`每轮提醒.md`](每轮提醒.md)。
+[`soul.md`](soul.md) 始终生效，可以单独使用。八步流程只在大任务时触发，触发之后仍然遵守 `soul.md`。正文二十七条，每条只写触发条件和默认动作，分四个阶段：动手前、要人决策时、执行中、收尾。每条的做法细则（格式、步骤、理由）在 [`SKILL.md`](skills/ai-thinking/SKILL.md) 的「做法细则」一节。怎么装、怎么确认生效、怎么按自己的经验改，见下一节。加载了不等于每轮照做：让 Claude Code、WorkBuddy、ChatGPT、Claude 网页每轮再提醒三条的办法，见 [`每轮提醒.md`](每轮提醒.md)。
 
 ## 怎么用 soul.md
 
@@ -146,6 +146,7 @@ done
 
 ## 更新记录
 
+- 2026-10-31：v33，`soul.md` 新增第 27 条「列方案前，先找动不了的约束」，原有条号不变，现为二十七条。[`SKILL.md`](skills/ai-thinking/SKILL.md) 第 1 步前新增必做的「第 0.7 步：先找动不了的约束，再顺着它找最短路径」（写出现实里改不了的约束及证据，再写顺着约束、能借就借的最短路径；先质疑约束是否真硬、借用方是否有理由配合），输出格式在「本质」之后加「动不了的约束 + 顺着约束的最短路径」。第 0.7 步另加一条「抬头看天，先找走通过的人」；第 27 条补一句：每个关键点要举出现实里已走通的先例并附来源，举不出标「无先例，推断」。SKILL.md 三份（主副本、WorkBuddy、ChatGPT 知识文件）同步，WorkBuddy zip 重打。评测未重跑。
 - 2026-10-30：v32，`soul.md` 只改第 1 条，条号不变、仍为二十六条。第 1 条改为「先说清结果，再列门槛」：写出结果后，列出要做成必须过的几道坎（平台规则、准入条件、关键风险、行业里做成的人都做到了什么），不懂的先查或找做成的案例学，再动手；只懂自己那块就开工不算懂。[`SKILL.md`](skills/ai-thinking/SKILL.md) 输出格式加硬性一栏「门槛核对」（逐道坎写已过/未过和证据，没核对的标「未验证」），「推荐」改为只推荐一个。顺手修掉各处残留的「一次问清 1–3 个问题」，统一成第 8 条的「最多问一个，先交决策单」（SKILL.md 三份、ChatGPT `1-` `5-`、WorkBuddy 安装说明、README）。新增评测用例 [`003`](evals/cases/003-1688打单工具.md)（做个 1688 打单工具），未跑。WorkBuddy zip 重打。
 - 2026-10-30：v31，`soul.md` 正文不变（仍为二十六条，编号不变），新增每轮提醒。正本 [`reminder.md`](reminder.md)：三行，对应第 8 条（决策单）、第 6 条（审结论）、第 18 条（附证据）。Claude Code 的 `UserPromptSubmit` hook [`hooks/claude-code/soul-reminder.sh`](hooks/claude-code/soul-reminder.sh) 每轮读它；[`hooks/install-hooks.py`](hooks/install-hooks.py) 把 hook 合并进 `~/.claude/settings.json` 或 `~/.workbuddy/settings.json`（先备份）。WorkBuddy hook 能否把输出送进上下文未验证，兜底是 `install.sh` 把提醒附在个人目录 `SOUL.md` 末尾。ChatGPT、Claude 网页没有 hook，提醒放进指令最前面（[`portable/chatgpt/`](portable/chatgpt/)、[`portable/claude/`](portable/claude/)）。[`scripts/sync_reminder.py`](scripts/sync_reminder.py) 检查条号和标题对得上 `soul.md`、各副本一致，`--write` 重新生成。`install.sh` 改为把 `~/.agents/soul.md` 做成软链接（旧实体文件备份到 `~/.Trash`），避免一份更新了、另一份过期。各平台装法和确认办法见 [`每轮提醒.md`](每轮提醒.md)。WorkBuddy zip 内容没变，未重打。
 - 2026-10-30：`soul.md` 升到 v30，只改第 8 条，条号不变、仍为二十六条。第 8 条改为「只在分歧点问，最多问一个，先交决策单」：要问之前先交四项，缺一项就不许问——① 唯一推荐；② 查了什么，附来源或输出；③ 用第 6 条自审挑出的毛病，至少一条；④ 为什么必须由人定，只认花钱、对外发送、不可逆、只有人知道的偏好四种；④ 说不出就自己定了去做。[`SKILL.md`](skills/ai-thinking/SKILL.md)「做法细则」第 8 条加决策单模板和用户的固定回复（缺②或③一律回「先查再来」，不讨论内容）；ChatGPT、WorkBuddy 副本和 WorkBuddy 的 zip 同步。新增评测用例 [`002`](evals/cases/002-一堆没查的想法丢给人定.md)（一堆没查的想法丢给人定），未跑。
