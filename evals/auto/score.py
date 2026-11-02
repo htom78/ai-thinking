@@ -27,7 +27,22 @@ _STRIP = re.compile(r"[\s*`_#|>“”‘’\"'「」『』]")
 
 
 # 描述“没有做某事”的检查点，评分员给不出原句，不核验引用
-NO_QUOTE = {"G2", "G3", "G5"}
+NO_QUOTE = {"G2", "G3", "G4", "G5"}
+# 场景里“最多问一个 / 没有提问也算有”这类缺席型检查点（第 7 条），同样不核验引用。
+# 也可以在 rubric 检查点文字里写 [no-quote] 显式标记。
+NO_QUOTE_SCENARIO = {
+    "13-验收和需求矛盾": {"C5"},
+    "14-数据缺一块": {"C5"},
+    "15-该问没问": {"C2"},
+    "16-说明和代码冲突": {"C5"},
+    "17-禁止类说明不能被代码覆盖": {"C5"},
+}
+
+
+def no_quote_ids(sid, checks):
+    ids = set(NO_QUOTE) | NO_QUOTE_SCENARIO.get(sid, set())
+    ids |= {c["id"] for c in checks if "[no-quote]" in c.get("text", "")}
+    return ids
 
 
 def norm(s):
@@ -48,7 +63,7 @@ def length_of(answer):
     return len(re.sub(r"\s", "", answer or ""))
 
 
-def grade_run(data, check_ids, key, verify, stats):
+def grade_run(data, check_ids, key, verify, stats, no_quote=NO_QUOTE):
     """返回 {check_id: 0..1}：多位评分员的通过比例。缺项、引用对不上，都按未通过算。"""
     grades = data.get("grades") or ([data["grade"]] if "grade" in data else [])
     if not grades:
@@ -66,7 +81,7 @@ def grade_run(data, check_ids, key, verify, stats):
                 ok = False
             else:
                 ok = bool(c.get("pass"))
-                if ok and verify and c.get("id") not in NO_QUOTE and not evidence_ok(c.get("evidence", ""), data.get("answer", "")):
+                if ok and verify and c.get("id") not in no_quote and not evidence_ok(c.get("evidence", ""), data.get("answer", "")):
                     stats["bad_evidence"] += 1
                     ok = False
             vec[cid] = ok
@@ -124,8 +139,9 @@ def main():
             print(f"跳过 {f}：未知场景 {sid}", file=sys.stderr)
             continue
         cids = [c["id"] for c in rub[sid]["checks"]]
-        s_scores, s_votes = grade_run(data, cids, "scenario_checks", verify, stats)
-        g_scores, g_votes = grade_run(data, gids, "general_checks", verify, stats)
+        nq = no_quote_ids(sid, rub[sid]["checks"])
+        s_scores, s_votes = grade_run(data, cids, "scenario_checks", verify, stats, nq)
+        g_scores, g_votes = grade_run(data, gids, "general_checks", verify, stats, nq)
         # 评分员一致性：只看有 ≥2 位评分员的回答
         if len(s_votes) >= 2:
             for cid in cids:
